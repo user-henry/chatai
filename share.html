@@ -964,13 +964,10 @@
     
     <script>
         // ============================================================
-        //  配置（复用 hzyai.html 的配置）
+        //  配置
+        //  说明：AI 密钥已全部上移到 hzyai-worker 服务端，前端不再持有任何 key。
         // ============================================================
-        const AGNES_CONFIG = {
-            baseUrl: 'https://apihub.agnes-ai.com/v1',
-            apiKey: 'sk-VNgflStoqtTeFqIfpntpL21vjl8Hx4RPQYRmDzrooHLB0IOi',
-            chatModel: 'agnes-2.0-flash'
-        };
+        const HZYAI_WORKER = 'https://hzyai-worker.nflshcchat.cc.cd';
 
         // ============================================================
         //  全局状态
