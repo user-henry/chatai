@@ -433,7 +433,7 @@
         }
 
         .daily-quote {
-            background: linear-gradient(135deg, var(--accent-color-alpha), rgba(255,215,0,0.02));
+            background: linear-gradient(135deg, var(--accent-color-alpha), transparent);
             border-left: 3px solid var(--accent-color);
             padding: 8px 16px;
             margin: 6px 24px 0 24px;
@@ -458,7 +458,7 @@
             flex-shrink: 0;
         }
         .daily-quote .refresh-btn:hover {
-            background: rgba(255,215,0,0.15);
+            background: var(--accent-color-alpha);
         }
         .daily-quote .quote-content {
             flex: 1;
@@ -1193,9 +1193,9 @@
             align-items: center;
             justify-content: center;
             min-height: 240px;
-            background: #0a0f1c;
+            background: var(--bg-primary);
             border-radius: 14px;
-            border: 1px dashed #2a2a3e;
+            border: 1px dashed var(--border-color);
             padding: 20px;
             overflow: hidden;
         }
@@ -1221,7 +1221,7 @@
         .vision-result-area .spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid #2a2a3e;
+            border: 3px solid var(--border-color);
             border-top-color: var(--accent-color);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
@@ -1237,7 +1237,7 @@
             overflow-y: auto;
             color: var(--text-secondary);
             padding: 16px;
-            background: #0a0f1c;
+            background: var(--bg-primary);
             border-radius: 8px;
             line-height: 1.6;
             white-space: pre-wrap;
@@ -1249,7 +1249,7 @@
             flex: 1;
             flex-direction: column;
             padding: 20px;
-            background: #0f172a;
+            background: var(--bg-tertiary);
             overflow-y: auto;
         }
         .task-mode.active {
@@ -1295,7 +1295,7 @@
             border-radius: 10px;
             background: var(--bg-primary);
             border: 1px solid var(--border-color);
-            color: white;
+            color: var(--text-primary);
             font-size: 13px;
         }
         .task-input-row select:focus,
@@ -1334,9 +1334,9 @@
             align-items: center;
             justify-content: center;
             min-height: 240px;
-            background: #0a0f1c;
+            background: var(--bg-primary);
             border-radius: 14px;
-            border: 1px dashed #2a2a3e;
+            border: 1px dashed var(--border-color);
             padding: 20px;
             overflow: hidden;
         }
@@ -1362,7 +1362,7 @@
         .task-result-area .spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid #2a2a3e;
+            border: 3px solid var(--border-color);
             border-top-color: var(--accent-color);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
@@ -1378,7 +1378,7 @@
             overflow-y: auto;
             color: var(--text-secondary);
             padding: 16px;
-            background: #0a0f1c;
+            background: var(--bg-primary);
             border-radius: 8px;
             line-height: 1.6;
             white-space: pre-wrap;
@@ -1417,7 +1417,7 @@
             flex: 1;
             flex-direction: column;
             padding: 20px;
-            background: #0f172a;
+            background: var(--bg-tertiary);
             overflow-y: auto;
         }
         .character-mode.active {
@@ -1500,7 +1500,7 @@
             color: white;
         }
         .character-card .actions .delete-btn {
-            background: #dc3545;
+            background: var(--danger);
             color: white;
         }
         .character-card .actions .select-btn {
@@ -1551,7 +1551,7 @@
             border-radius: 8px;
             background: var(--bg-primary);
             border: 1px solid var(--border-color);
-            color: white;
+            color: var(--text-primary);
             font-family: inherit;
             font-size: 13px;
         }
@@ -1580,7 +1580,7 @@
         }
         .character-modal-content .modal-actions .cancel-btn {
             background: var(--bg-tertiary);
-            color: white;
+            color: var(--text-primary);
         }
         .character-modal-content .modal-actions .save-btn {
             background: var(--accent-color);
@@ -1600,7 +1600,7 @@
         .chat-role-selector select {
             background: transparent;
             border: none;
-            color: white;
+            color: var(--text-primary);
             font-size: 12px;
             padding: 4px 0;
             cursor: pointer;
@@ -1624,7 +1624,7 @@
             bottom: 0;
             width: 300px;
             background: var(--bg-tertiary);
-            border-left: 1px solid #2a2a3e;
+            border-left: 1px solid var(--border-color);
             overflow-y: auto;
             padding: 20px;
         }
@@ -1674,7 +1674,7 @@
             text-align: center;
             padding-top: 16px;
             margin-top: 16px;
-            border-top: 1px solid #2a2a3e;
+            border-top: 1px solid var(--border-color);
             font-size: 11px;
             color: var(--text-muted);
         }
@@ -1729,7 +1729,7 @@
         .voice-control-panel input[type="checkbox"] {
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
-            color: white;
+            color: var(--text-primary);
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 11px;
@@ -1787,7 +1787,7 @@
         }
         .voice-btn:hover {
             color: var(--accent-color);
-            background: rgba(255,215,0,0.1);
+            background: var(--accent-color-alpha);
         }
         .voice-btn:disabled {
             opacity: 0.5;
@@ -1808,7 +1808,7 @@
         }
         .voice-clear-btn:hover {
             color: var(--accent-color);
-            background: rgba(255,215,0,0.1);
+            background: var(--accent-color-alpha);
         }
 
         @media (max-width: 900px) {
@@ -1919,7 +1919,7 @@
         }
         .tts-btn:hover {
             color: var(--accent-color);
-            background: rgba(255,215,0,0.1);
+            background: var(--accent-color-alpha);
         }
 
         /* ===== AI 短片工作流样式 ===== */
@@ -1928,7 +1928,7 @@
             flex: 1;
             flex-direction: column;
             padding: 20px;
-            background: #0f172a;
+            background: var(--bg-tertiary);
             overflow-y: auto;
         }
         .film-mode.active {
@@ -1975,7 +1975,7 @@
             border-radius: 8px;
             background: var(--bg-primary);
             border: 1px solid var(--border-color);
-            color: white;
+            color: var(--text-primary);
             font-size: 14px;
         }
         .film-input-area input:focus {
@@ -2003,7 +2003,7 @@
         .film-output {
             margin-top: 12px;
             padding: 14px;
-            background: #0a0f1c;
+            background: var(--bg-primary);
             border-radius: 8px;
             color: var(--text-secondary);
             white-space: pre-wrap;
@@ -2030,7 +2030,7 @@
             aspect-ratio: 16/9;
             object-fit: cover;
             border-radius: 4px;
-            background: #0a0f1c;
+            background: var(--bg-primary);
         }
         .film-scene-card .scene-label {
             font-size: 12px;
@@ -2074,10 +2074,10 @@
             aspect-ratio: 16/9;
             object-fit: cover;
             border-radius: 4px;
-            background: #0a0f1c;
+            background: var(--bg-primary);
         }
         .film-preview {
-            background: #0a0f1c;
+            background: var(--bg-primary);
             border-radius: 8px;
             padding: 16px;
         }
@@ -2129,7 +2129,7 @@
             transition: all 0.2s;
         }
         .stats-panel .stats-header .reset-btn:hover {
-            background: #dc3545;
+            background: var(--danger);
             color: white;
         }
         .stats-grid {
@@ -2156,7 +2156,7 @@
         .stats-grid .stat-item .stat-number.blue { color: var(--info); }
         .stats-grid .stat-item .stat-number.green { color: var(--success); }
         .stats-grid .stat-item .stat-number.purple { color: var(--extra-purple); }
-        .stats-grid .stat-item .stat-number.red { color: #dc3545; }
+        .stats-grid .stat-item .stat-number.red { color: var(--danger); }
         .model-usage-list {
             display: flex;
             flex-wrap: wrap;
@@ -2178,7 +2178,7 @@
         .stats-detail {
             margin-top: 12px;
             padding-top: 12px;
-            border-top: 1px solid #2a2a3e;
+            border-top: 1px solid var(--border-color);
             font-size: 11px;
             color: var(--text-muted);
             display: flex;
@@ -2201,7 +2201,7 @@
         }
         .stats-toggle-btn:hover {
             color: var(--accent-color);
-            background: rgba(255,215,0,0.1);
+            background: var(--accent-color-alpha);
         }
         @media (max-width: 768px) {
             .stats-panel {
@@ -2222,7 +2222,7 @@
             flex: 1;
             flex-direction: column;
             padding: 20px;
-            background: #0f172a;
+            background: var(--bg-tertiary);
             overflow-y: auto;
         }
         .longvideo-mode.active { display: flex; }
@@ -2274,7 +2274,7 @@
             border-radius: 8px;
             background: var(--bg-primary);
             border: 1px solid var(--border-color);
-            color: white;
+            color: var(--text-primary);
             font-size: 13px;
             font-family: inherit;
         }
@@ -2426,11 +2426,11 @@
             font-size: 13px;
             font-family: inherit;
             background: var(--bg-tertiary);
-            color: white;
+            color: var(--text-primary);
             transition: background 0.2s;
         }
         .lv-controls button:hover {
-            background: #3a3a4e;
+            background: var(--hover-bg);
         }
         #lvTimeDisplay {
             color: var(--text-muted);
@@ -2479,7 +2479,7 @@
             padding: 18px;
             color: var(--text-primary);
         }
-        .tts-panel label, .embed-panel label { display:block; margin: 10px 0 6px; font-size: 13px; color:#bbb; }
+        .tts-panel label, .embed-panel label { display:block; margin: 10px 0 6px; font-size: 13px; color:var(--text-secondary); }
         .tts-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:12px; }
         .tts-player { margin-top:14px; }
         .embed-result { margin-top:14px; max-height:340px; overflow:auto; }
@@ -2501,8 +2501,8 @@
         }
         .market-card-icon { font-size: 22px; }
         .market-card-name { font-weight: 600; color: var(--text-primary); }
-        .market-card-id { font-size: 11px; color: #6fa8ff; word-break: break-all; }
-        .market-card-desc { font-size: 12px; color: #999; }
+        .market-card-id { font-size: 11px; color: var(--info); word-break: break-all; }
+        .market-card-desc { font-size: 12px; color: var(--text-muted); }
         .market-chat-btn {
             margin-top: 6px;
             background: var(--accent-color);
@@ -2515,17 +2515,1170 @@
         }
 
         /* 统一生成历史面板（代码/音频/搜索/图像/视频） */
-        .gen-history-panel { margin-top:14px; border-top:1px solid #2a2a40; padding-top:10px; }
+        .gen-history-panel { margin-top:14px; border-top:1px solid var(--border-color); padding-top:10px; }
         .gen-history-title { font-size:13px; color:var(--accent-color); margin-bottom:8px; font-weight:600; }
         .gen-history-list { display:flex; flex-direction:column; gap:8px; max-height:340px; overflow:auto; }
-        .gen-history-item { background:var(--bg-primary); border:1px solid #2a2a40; border-radius:8px; padding:8px 10px; }
-        .gen-history-head { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:13px; color:#eee; }
-        .gen-history-time { font-size:11px; color:#777; margin-top:4px; }
+        .gen-history-item { background:var(--bg-primary); border:1px solid var(--border-color); border-radius:8px; padding:8px 10px; }
+        .gen-history-head { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:13px; color:var(--text-primary); }
+        .gen-history-time { font-size:11px; color:var(--text-muted); margin-top:4px; }
         .gen-del-btn, .msg-del-btn { background:transparent; border:none; cursor:pointer; font-size:14px; line-height:1; padding:2px 4px; border-radius:4px; }
-        .gen-del-btn:hover, .msg-del-btn:hover { background:#ff4757; }
+        .gen-del-btn:hover, .msg-del-btn:hover { background:var(--danger); }
         .msg-del-btn { margin-left:auto; opacity:.6; }
         .message-content { display:flex; align-items:flex-start; gap:6px; flex-wrap:wrap; }
-        .gen-history-item pre { background:#0f0f1e; padding:6px; border-radius:6px; font-size:12px; }
+        .gen-history-item pre { background:var(--bg-secondary); padding:6px; border-radius:6px; font-size:12px; }
+        /* ============================================================
+           ✨ UI POLISH 层 —— 纯视觉打磨（不改任何 JS / id / class 名称）
+           统一视觉语言：色值走主题变量 · 过渡 .18s~.28s ease
+           弹层统一 pop-in 入场 · 滚动条细窄半透明 · <640px 无横向滚动
+           注：HZYAI 环形 loader 与 Generate 发光按钮为刻意保留的设计语言，
+               本层只为其周围的容器做呼应式统一，不修改其动画本身。
+           ============================================================ */
+        :root {
+            /* 圆角 / 动效令牌 */
+            --hzy-r-sm: 8px;
+            --hzy-r-md: 12px;
+            --hzy-r-lg: 16px;
+            --hzy-r-xl: 22px;
+            --hzy-ease: cubic-bezier(.22, .61, .36, 1);
+            --hzy-t-fast: .18s;
+            --hzy-t-base: .22s;
+            --hzy-t-slow: .28s;
+            --hzy-font-mono: 'Cascadia Mono', 'JetBrains Mono', 'Consolas', 'SFMono-Regular', Menlo, 'DejaVu Sans Mono', monospace;
+            /* 阴影层次（深色底） */
+            --hzy-shadow-1: 0 1px 2px rgba(0,0,0,.20), 0 2px 8px rgba(0,0,0,.14);
+            --hzy-shadow-2: 0 6px 18px rgba(0,0,0,.26), 0 2px 6px rgba(0,0,0,.16);
+            --hzy-shadow-3: 0 18px 44px rgba(0,0,0,.45);
+            --hzy-glow: 0 0 0 3px var(--accent-color-alpha), 0 0 16px -4px var(--accent-color);
+            --hzy-lift: 0 6px 18px -8px var(--accent-color), 0 2px 8px rgba(0,0,0,.28);
+            /* 滚动条（细窄 / 半透明 / 悬停加深） */
+            --hzy-scroll: rgba(255,255,255,.15);
+            --hzy-scroll-hover: rgba(255,255,255,.32);
+            /* 代码块顶部工具条底色 */
+            --hzy-code-bar: rgba(255,255,255,.055);
+        }
+        [data-theme="light"] {
+            --hzy-shadow-1: 0 1px 2px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.05);
+            --hzy-shadow-2: 0 6px 18px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.06);
+            --hzy-shadow-3: 0 18px 44px rgba(0,0,0,.18);
+            --hzy-glow: 0 0 0 3px var(--accent-color-alpha), 0 0 14px -6px var(--accent-color);
+            --hzy-lift: 0 6px 16px -8px var(--accent-color), 0 2px 6px rgba(0,0,0,.10);
+            --hzy-scroll: rgba(0,0,0,.16);
+            --hzy-scroll-hover: rgba(0,0,0,.34);
+            --hzy-code-bar: rgba(0,0,0,.045);
+        }
+
+        /* ---------- 文本选中 ---------- */
+        ::selection {
+            background: var(--accent-color);
+            color: var(--bg-primary);
+        }
+
+        /* ---------- 滚动条：细窄、半透明、悬停加深 ---------- */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--hzy-scroll-hover) transparent;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--hzy-scroll);
+            background-clip: padding-box;
+            border: 2px solid transparent;
+            border-radius: 999px;
+            transition: background var(--hzy-t-fast) ease;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--hzy-scroll-hover);
+            background-clip: padding-box;
+        }
+        ::-webkit-scrollbar-corner {
+            background: transparent;
+        }
+
+        /* ---------- 输入焦点：统一金色描边 + 光晕 ---------- */
+        .login-card input:focus,
+        .theme-select:focus,
+        .chat-header .model-selector select:focus,
+        .draw-input-row input:focus,
+        .draw-input-row select:focus,
+        .vision-input-row input:focus,
+        .vision-input-row select:focus,
+        .task-input-row input:focus,
+        .task-input-row select:focus,
+        .film-input-area input:focus,
+        .longvideo-group select:focus,
+        .longvideo-group textarea:focus,
+        .character-modal-content input:focus,
+        .character-modal-content textarea:focus,
+        .character-modal-content select:focus,
+        .voice-control-panel select:focus,
+        .voice-control-panel input:focus,
+        .tts-panel textarea:focus,
+        .embed-panel textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: var(--hzy-glow);
+        }
+        .chat-role-selector:focus-within {
+            border-color: var(--accent-color);
+            box-shadow: var(--hzy-glow);
+        }
+        input::placeholder,
+        textarea::placeholder {
+            color: var(--text-muted);
+            opacity: .85;
+        }
+
+        /* ============================================================
+           ① 侧边栏：会话项悬停/选中态 + 统一的圆角图标按钮
+           ============================================================ */
+        .sidebar {
+            box-shadow: 1px 0 24px rgba(0,0,0,.18);
+        }
+        .conversations-list {
+            padding: 0 10px 8px;
+            scroll-behavior: smooth;
+        }
+        .conversation-item {
+            background: transparent;
+            border: 1px solid transparent;
+            border-left: 3px solid transparent;
+            border-radius: var(--hzy-r-md);
+            margin-bottom: 6px;
+            padding: 11px 12px;
+            transition: background var(--hzy-t-base) ease, border-color var(--hzy-t-base) ease,
+                        transform var(--hzy-t-base) ease, box-shadow var(--hzy-t-base) ease;
+        }
+        .conversation-item:hover {
+            background: var(--hover-bg);
+            border-color: var(--border-color);
+            transform: translateX(2px);
+        }
+        .conversation-item.active {
+            background: linear-gradient(90deg, var(--accent-color-alpha), transparent 85%);
+            border-color: transparent;
+            border-left-color: var(--accent-color);
+            box-shadow: inset 0 0 0 1px var(--accent-color-alpha);
+        }
+        .conversation-title {
+            padding-right: 78px;
+            font-weight: 600;
+            letter-spacing: .01em;
+        }
+        .conversation-time {
+            font-size: 11px;
+            color: var(--text-muted);
+            opacity: .9;
+        }
+        /* 会话操作按钮：统一的小圆角图标按钮，悬停才浮现 */
+        .delete-conv,
+        .export-conv-btn,
+        .rename-conv-btn {
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            font-size: 11px;
+            line-height: 1;
+            padding: 0;
+            background: transparent;
+            transition: opacity var(--hzy-t-fast) ease, background var(--hzy-t-fast) ease,
+                        color var(--hzy-t-fast) ease;
+        }
+        .delete-conv { right: 8px; }
+        .export-conv-btn { right: 32px; }
+        .rename-conv-btn { right: 56px; }
+        .delete-conv:hover,
+        .export-conv-btn:hover,
+        .rename-conv-btn:hover {
+            background: var(--hover-bg);
+        }
+        .new-chat-btn {
+            border-radius: var(--hzy-r-md);
+            transition: transform var(--hzy-t-fast) ease, box-shadow var(--hzy-t-base) ease, filter var(--hzy-t-base) ease;
+        }
+        .new-chat-btn:hover {
+            opacity: 1;
+            transform: translateY(-1px);
+            box-shadow: var(--hzy-lift);
+            filter: brightness(1.04);
+        }
+        .new-chat-btn:active {
+            transform: translateY(0) scale(.99);
+        }
+        .theme-select {
+            border-radius: 999px;
+            padding: 7px 12px;
+            transition: border-color var(--hzy-t-fast) ease, box-shadow var(--hzy-t-fast) ease;
+        }
+        .user-info {
+            background: var(--hover-bg);
+        }
+        .user-avatar {
+            box-shadow: 0 0 0 1px var(--accent-color), var(--hzy-shadow-1);
+        }
+        /* 顶部/角落一致的圆角图标按钮 */
+        .logout-btn,
+        .stats-toggle-btn,
+        .menu-btn,
+        .daily-quote .refresh-btn {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1;
+            cursor: pointer;
+            transition: background var(--hzy-t-fast) ease, color var(--hzy-t-fast) ease,
+                        border-color var(--hzy-t-fast) ease, transform var(--hzy-t-fast) ease;
+        }
+        .logout-btn:hover,
+        .stats-toggle-btn:hover,
+        .menu-btn:hover,
+        .daily-quote .refresh-btn:hover {
+            background: var(--accent-color-alpha);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            transform: translateY(-1px);
+        }
+        /* 移动端抽屉按钮：补上此前缺失的基础定位 */
+        .menu-btn {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 300;
+            background: var(--bg-secondary);
+            border-color: var(--border-color);
+            box-shadow: var(--hzy-shadow-2);
+        }
+
+        /* ============================================================
+           ② 顶部模式标签 + 聊天头部
+           ============================================================ */
+        .mode-tabs {
+            gap: 6px;
+            padding: 8px 14px;
+            align-items: center;
+        }
+        .mode-tab {
+            border: 1px solid transparent;
+            border-radius: 999px;
+            padding: 7px 13px;
+            transition: background var(--hzy-t-base) ease, color var(--hzy-t-base) ease,
+                        border-color var(--hzy-t-base) ease, transform var(--hzy-t-fast) ease,
+                        box-shadow var(--hzy-t-base) ease;
+        }
+        .mode-tab:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+            transform: translateY(-1px);
+        }
+        .mode-tab.active {
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+            border-color: var(--accent-color);
+            color: var(--bg-primary);
+            box-shadow: 0 2px 12px -4px var(--accent-color);
+        }
+        .chat-header {
+            gap: 10px;
+        }
+        .chat-header h1 {
+            letter-spacing: .01em;
+        }
+        .chat-header .model-selector select {
+            border-radius: 999px;
+            padding: 5px 12px;
+            transition: border-color var(--hzy-t-fast) ease, box-shadow var(--hzy-t-fast) ease;
+        }
+        .chat-role-selector {
+            border-radius: 999px;
+            transition: border-color var(--hzy-t-fast) ease, box-shadow var(--hzy-t-fast) ease;
+        }
+        .sync-bar {
+            gap: 6px;
+        }
+        .sync-btn {
+            padding: 5px 12px;
+            font-size: 11px;
+            transition: background var(--hzy-t-base) ease, color var(--hzy-t-base) ease,
+                        transform var(--hzy-t-fast) ease, box-shadow var(--hzy-t-base) ease;
+        }
+        .sync-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--hzy-lift);
+        }
+        .sync-warning {
+            opacity: .9;
+        }
+        .daily-quote {
+            border-radius: 0 var(--hzy-r-md) var(--hzy-r-md) 0;
+            transition: background var(--hzy-t-base) ease;
+        }
+
+        /* ============================================================
+           ③ 消息气泡：更精致的圆角 / 间距 / 阴影 + 用户与助手区分
+           ============================================================ */
+        .messages-area {
+            padding: 22px 22px 30px;
+            scroll-behavior: smooth;
+        }
+        .message {
+            align-items: flex-start;
+            margin-bottom: 22px;
+            animation: fadeIn var(--hzy-t-slow) ease;
+        }
+        .message-avatar {
+            box-shadow: 0 0 0 1px var(--border-color);
+            font-size: 15px;
+        }
+        .message.user .message-avatar {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+        }
+        .message.assistant .message-avatar {
+            box-shadow: 0 0 0 1px var(--accent-color), 0 2px 10px -4px var(--accent-color);
+        }
+        .message-content {
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 4px 6px;
+            max-width: 74%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.62;
+            overflow-wrap: anywhere;
+            transition: box-shadow var(--hzy-t-base) ease, border-color var(--hzy-t-base) ease;
+        }
+        /* 用户：金色描边 + 淡淡金色底的「我」气泡 */
+        .message.user .message-content {
+            background: var(--accent-color-alpha);
+            border: 1px solid var(--accent-color);
+            border-top-right-radius: 6px;
+            color: var(--text-primary);
+            box-shadow: var(--hzy-shadow-1);
+        }
+        /* 助手：沉稳的中性卡片气泡 */
+        .message.assistant .message-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-top-left-radius: 6px;
+            color: var(--text-secondary);
+            box-shadow: var(--hzy-shadow-1);
+        }
+        .message.assistant .message-content:hover {
+            border-color: var(--border-color);
+            box-shadow: var(--hzy-shadow-2);
+        }
+        /* 气泡内所有块级 markdown 元素各占一行，避免并排错位/横向溢出 */
+        .message-content > :not(button) {
+            min-width: 0;
+        }
+        .message-content > p,
+        .message-content > ul,
+        .message-content > ol,
+        .message-content > pre,
+        .message-content > blockquote,
+        .message-content > table,
+        .message-content > h1,
+        .message-content > h2,
+        .message-content > h3,
+        .message-content > h4,
+        .message-content > h5,
+        .message-content > h6,
+        .message-content > hr,
+        .message-content > img,
+        .message-content > video {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        .message-content img,
+        .message-content video {
+            border-radius: var(--hzy-r-md);
+            border: 1px solid var(--border-color);
+            margin: 2px 0;
+            box-shadow: var(--hzy-shadow-1);
+        }
+        /* 消息操作按钮（🔊 / 🗑️）：统一成圆角小图标按钮，常在但低调 */
+        .message-content .tts-btn,
+        .message-content .msg-del-btn {
+            flex: 0 0 auto;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin-left: 6px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--hzy-r-sm);
+            background: var(--hover-bg);
+            color: var(--text-muted);
+            font-size: 12px;
+            line-height: 1;
+            opacity: .55;
+            transition: opacity var(--hzy-t-fast) ease, background var(--hzy-t-fast) ease,
+                        color var(--hzy-t-fast) ease, border-color var(--hzy-t-fast) ease,
+                        transform var(--hzy-t-fast) ease;
+        }
+        .message.assistant .message-content .tts-btn,
+        .message.user .message-content .msg-del-btn {
+            margin-left: auto;
+        }
+        .message-content:hover .tts-btn,
+        .message-content:hover .msg-del-btn {
+            opacity: .9;
+        }
+        .message-content .tts-btn:hover {
+            opacity: 1;
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+            background: var(--accent-color-alpha);
+            transform: translateY(-1px);
+        }
+        .message-content .msg-del-btn:hover {
+            opacity: 1;
+            color: var(--bg-primary);
+            border-color: var(--danger);
+            background: var(--danger);
+            transform: translateY(-1px);
+        }
+        /* 等待中的 Generation 环形 loader：只补一层与气泡呼应的容器 */
+        .message > .hzyai-loader {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--hzy-r-lg);
+            box-shadow: var(--hzy-shadow-1);
+        }
+        .thinking {
+            border: 1px solid var(--border-color);
+            box-shadow: var(--hzy-shadow-1);
+        }
+
+        /* ============================================================
+           ④ Markdown 元素：标题 / 列表 / 引用 / 表格 / 链接 统一间距与配色
+           ============================================================ */
+        .message-content p {
+            margin: 0 0 8px;
+        }
+        .message-content h1,
+        .message-content h2,
+        .message-content h3,
+        .message-content h4,
+        .message-content h5,
+        .message-content h6 {
+            margin: 14px 0 8px;
+            color: var(--text-primary);
+            font-weight: 700;
+            line-height: 1.35;
+        }
+        .message-content h1 {
+            font-size: 1.34em;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .message-content h2 {
+            font-size: 1.2em;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .message-content h3 { font-size: 1.1em; }
+        .message-content h4 { font-size: 1.03em; }
+        .message-content h5,
+        .message-content h6 {
+            font-size: 1em;
+            color: var(--text-secondary);
+        }
+        .message-content ul,
+        .message-content ol {
+            margin: 0 0 8px;
+            padding-left: 22px;
+        }
+        .message-content li {
+            margin: 0 0 4px;
+        }
+        .message-content li::marker {
+            color: var(--accent-color);
+        }
+        .message-content blockquote {
+            margin: 0 0 8px;
+            padding: 8px 14px;
+            background: var(--hover-bg);
+            border-left: 3px solid var(--accent-color);
+            border-radius: 0 var(--hzy-r-sm) var(--hzy-r-sm) 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        .message-content blockquote p:last-child {
+            margin-bottom: 0;
+        }
+        .message-content hr {
+            flex: 0 0 100%;
+            margin: 12px 0;
+            border: none;
+            border-top: 1px solid var(--border-color);
+        }
+        .message-content a {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px solid var(--accent-color-alpha);
+            transition: border-color var(--hzy-t-fast) ease, opacity var(--hzy-t-fast) ease;
+        }
+        .message-content a:hover {
+            border-bottom-color: var(--accent-color);
+            opacity: .92;
+        }
+        .message-content table {
+            display: block;
+            width: 100%;
+            margin: 0 0 10px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--hzy-r-sm);
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .message-content th,
+        .message-content td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+            vertical-align: top;
+        }
+        .message-content th {
+            background: var(--hover-bg);
+            color: var(--accent-color);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .message-content tbody tr:hover td {
+            background: var(--hover-bg);
+        }
+        .message-content tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .message-content p:last-of-type,
+        .message-content ul:last-of-type,
+        .message-content ol:last-of-type,
+        .message-content pre:last-of-type,
+        .message-content blockquote:last-of-type,
+        .message-content table:last-of-type {
+            margin-bottom: 0;
+        }
+
+        /* ============================================================
+           ⑤ 代码块：等宽字体 / 圆角 / 顶部工具条（语言标签 + 三点）/ 美化滚动条
+           ============================================================ */
+        .message-content :not(pre) > code {
+            padding: 1px 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--hover-bg);
+            color: var(--accent-color);
+            font-family: var(--hzy-font-mono);
+            font-size: .88em;
+        }
+        .message-content > pre {
+            position: relative;
+            margin: 0 0 10px;
+            padding: 34px 14px 12px;
+            background: var(--bg-tertiary);
+            background-image: linear-gradient(var(--hzy-code-bar), var(--hzy-code-bar));
+            background-repeat: no-repeat;
+            background-size: 100% 30px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--hzy-r-md);
+            box-shadow: var(--hzy-shadow-1);
+            overflow-x: auto;
+            overscroll-behavior-x: contain;
+        }
+        .message-content > pre > code {
+            display: block;
+            font-family: var(--hzy-font-mono);
+            font-size: 12.5px;
+            line-height: 1.62;
+            color: var(--text-primary);
+            white-space: pre;
+            tab-size: 4;
+        }
+        /* 工具条三点（纯 CSS，不依赖任何脚本） */
+        .message-content > pre::after {
+            content: "";
+            position: absolute;
+            top: 11px;
+            left: 13px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            box-shadow: 14px 0 0 var(--accent-hover), 28px 0 0 var(--success);
+            opacity: .8;
+            pointer-events: none;
+        }
+        /* 语言标签（:has() 渐进增强；不支持时工具条仍保留三点装饰） */
+        .message-content > pre:has(> code[class*="language-"])::before {
+            content: "CODE";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            padding-left: 52px;
+            font-family: var(--hzy-font-mono);
+            font-size: 11px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            pointer-events: none;
+        }
+        .message-content > pre:has(> code[class~="language-html"])::before { content: "HTML"; }
+        .message-content > pre:has(> code[class~="language-css"])::before { content: "CSS"; }
+        .message-content > pre:has(> code[class~="language-scss"])::before { content: "SCSS"; }
+        .message-content > pre:has(> code[class~="language-javascript"])::before { content: "JavaScript"; }
+        .message-content > pre:has(> code[class~="language-jsx"])::before { content: "JSX"; }
+        .message-content > pre:has(> code[class~="language-js"])::before { content: "JavaScript"; }
+        .message-content > pre:has(> code[class~="language-typescript"])::before { content: "TypeScript"; }
+        .message-content > pre:has(> code[class~="language-tsx"])::before { content: "TSX"; }
+        .message-content > pre:has(> code[class~="language-ts"])::before { content: "TypeScript"; }
+        .message-content > pre:has(> code[class~="language-python"])::before { content: "Python"; }
+        .message-content > pre:has(> code[class~="language-py"])::before { content: "Python"; }
+        .message-content > pre:has(> code[class~="language-java"])::before { content: "Java"; }
+        .message-content > pre:has(> code[class~="language-kotlin"])::before { content: "Kotlin"; }
+        .message-content > pre:has(> code[class~="language-swift"])::before { content: "Swift"; }
+        .message-content > pre:has(> code[class~="language-csharp"])::before { content: "C#"; }
+        .message-content > pre:has(> code[class~="language-cpp"])::before { content: "C++"; }
+        .message-content > pre:has(> code[class~="language-c"])::before { content: "C"; }
+        .message-content > pre:has(> code[class~="language-go"])::before { content: "Go"; }
+        .message-content > pre:has(> code[class~="language-rust"])::before { content: "Rust"; }
+        .message-content > pre:has(> code[class~="language-php"])::before { content: "PHP"; }
+        .message-content > pre:has(> code[class~="language-ruby"])::before { content: "Ruby"; }
+        .message-content > pre:has(> code[class~="language-sql"])::before { content: "SQL"; }
+        .message-content > pre:has(> code[class~="language-jsonc"])::before { content: "JSONC"; }
+        .message-content > pre:has(> code[class~="language-json"])::before { content: "JSON"; }
+        .message-content > pre:has(> code[class~="language-yaml"])::before { content: "YAML"; }
+        .message-content > pre:has(> code[class~="language-yml"])::before { content: "YAML"; }
+        .message-content > pre:has(> code[class~="language-toml"])::before { content: "TOML"; }
+        .message-content > pre:has(> code[class~="language-ini"])::before { content: "INI"; }
+        .message-content > pre:has(> code[class~="language-xml"])::before { content: "XML"; }
+        .message-content > pre:has(> code[class~="language-bash"])::before { content: "Bash"; }
+        .message-content > pre:has(> code[class~="language-shell"])::before { content: "Shell"; }
+        .message-content > pre:has(> code[class~="language-zsh"])::before { content: "Zsh"; }
+        .message-content > pre:has(> code[class~="language-sh"])::before { content: "Shell"; }
+        .message-content > pre:has(> code[class~="language-powershell"])::before { content: "PowerShell"; }
+        .message-content > pre:has(> code[class~="language-markdown"])::before { content: "Markdown"; }
+        .message-content > pre:has(> code[class~="language-md"])::before { content: "Markdown"; }
+        .message-content > pre:has(> code[class~="language-diff"])::before { content: "Diff"; }
+        .message-content > pre:has(> code[class~="language-text"])::before { content: "Text"; }
+        .message-content > pre:has(> code[class~="language-plaintext"])::before { content: "Text"; }
+
+        /* ============================================================
+           ⑥ 表单与按钮：聚焦金色光晕 · 主按钮渐变悬停抬升 · 禁用态清晰
+           ============================================================ */
+        .input-area {
+            padding: 14px 22px 16px;
+        }
+        .input-wrapper {
+            border-radius: var(--hzy-r-lg);
+            padding: 7px 12px;
+            transition: border-color var(--hzy-t-base) ease, box-shadow var(--hzy-t-base) ease;
+        }
+        .input-wrapper:focus-within {
+            border-color: var(--accent-color);
+            box-shadow: var(--hzy-glow);
+        }
+        .input-wrapper textarea {
+            min-height: 24px;
+            line-height: 1.5;
+            transition: color var(--hzy-t-fast) ease;
+        }
+        /* 主按钮统一：轻微渐变（原有）+ 悬停抬升 + 按下回弹 + 禁用清晰
+           注：.hzyai-gen-btn 为刻意保留的发光等待按钮，排除在外 */
+        .send-btn,
+        .new-chat-btn,
+        .draw-generate-btn,
+        .task-generate-btn,
+        .film-btn,
+        .lv-generate-btn,
+        .market-chat-btn,
+        .login-card button,
+        .character-modal-content .modal-actions button {
+            transition: transform var(--hzy-t-fast) ease, box-shadow var(--hzy-t-base) ease,
+                        filter var(--hzy-t-base) ease, opacity var(--hzy-t-fast) ease,
+                        background-color var(--hzy-t-base) ease;
+        }
+        .send-btn:hover:not(:disabled):not(.hzyai-gen-btn),
+        .draw-generate-btn:hover:not(:disabled):not(.hzyai-gen-btn),
+        .task-generate-btn:hover:not(:disabled):not(.hzyai-gen-btn),
+        .film-btn:hover:not(:disabled):not(.hzyai-gen-btn),
+        .lv-generate-btn:hover:not(:disabled):not(.hzyai-gen-btn),
+        .market-chat-btn:hover:not(:disabled):not(.hzyai-gen-btn),
+        .login-card button:hover:not(:disabled):not(.hzyai-gen-btn),
+        .new-chat-btn:hover:not(:disabled):not(.hzyai-gen-btn) {
+            transform: translateY(-1px);
+            box-shadow: var(--hzy-lift);
+            filter: brightness(1.05);
+        }
+        .send-btn:active:not(:disabled):not(.hzyai-gen-btn),
+        .draw-generate-btn:active:not(:disabled):not(.hzyai-gen-btn),
+        .task-generate-btn:active:not(:disabled):not(.hzyai-gen-btn),
+        .film-btn:active:not(:disabled):not(.hzyai-gen-btn),
+        .lv-generate-btn:active:not(:disabled):not(.hzyai-gen-btn),
+        .login-card button:active:not(:disabled):not(.hzyai-gen-btn) {
+            transform: translateY(0) scale(.985);
+            box-shadow: var(--hzy-shadow-1);
+        }
+        .send-btn {
+            border-radius: var(--hzy-r-md);
+            padding: 8px 18px;
+        }
+        .send-btn:disabled:not(.hzyai-gen-btn),
+        .draw-generate-btn:disabled:not(.hzyai-gen-btn),
+        .task-generate-btn:disabled:not(.hzyai-gen-btn),
+        .film-btn:disabled:not(.hzyai-gen-btn),
+        .lv-generate-btn:disabled:not(.hzyai-gen-btn),
+        .market-chat-btn:disabled:not(.hzyai-gen-btn),
+        .new-chat-btn:disabled:not(.hzyai-gen-btn),
+        .login-card button:disabled:not(.hzyai-gen-btn) {
+            opacity: .45;
+            cursor: not-allowed;
+            filter: grayscale(.45);
+            box-shadow: none;
+            transform: none;
+        }
+        /* 等待中的 Generate 发光按钮保持满亮度：原有 :disabled 的 opacity:.5 会把
+           这份刻意的发光设计压暗，这里为保留的设计语言让路（动画本身未改动） */
+        .hzyai-gen-btn:disabled {
+            opacity: 1;
+            cursor: wait;
+            filter: none;
+        }
+        .image-upload-btn,
+        .vision-upload-area .upload-btn {
+            border-radius: var(--hzy-r-sm);
+            transition: border-color var(--hzy-t-fast) ease, color var(--hzy-t-fast) ease,
+                        background var(--hzy-t-fast) ease, transform var(--hzy-t-fast) ease;
+        }
+        .image-upload-btn:hover,
+        .vision-upload-area .upload-btn:hover {
+            background: var(--accent-color-alpha);
+            transform: translateY(-1px);
+        }
+        .draw-input-row input,
+        .draw-input-row select,
+        .vision-input-row input,
+        .vision-input-row select,
+        .task-input-row input,
+        .task-input-row select,
+        .film-input-area input,
+        .longvideo-group select,
+        .longvideo-group textarea {
+            transition: border-color var(--hzy-t-fast) ease, box-shadow var(--hzy-t-fast) ease;
+        }
+        .remove-hint {
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+        }
+        .login-card {
+            border-radius: var(--hzy-r-xl);
+            box-shadow: var(--hzy-shadow-3);
+            animation: hzy-pop-in var(--hzy-t-slow) var(--hzy-ease);
+        }
+        .login-card input {
+            border-radius: var(--hzy-r-md);
+            transition: border-color var(--hzy-t-fast) ease, box-shadow var(--hzy-t-fast) ease;
+        }
+        .login-card button {
+            border-radius: var(--hzy-r-md);
+        }
+        .slider-container,
+        .slider-thumb,
+        .slider-progress {
+            border-radius: var(--hzy-r-md);
+        }
+
+        /* ============================================================
+           ⑦ 卡片与面板：统一圆角 / 悬停描边与轻微抬升
+           ============================================================ */
+        .character-card,
+        .market-card,
+        .film-step,
+        .longvideo-settings,
+        .tts-panel,
+        .embed-panel,
+        .gen-history-item,
+        .task-history-item,
+        .lv-player,
+        .lv-progress-area {
+            border-radius: var(--hzy-r-lg);
+            transition: border-color var(--hzy-t-base) ease, transform var(--hzy-t-base) ease,
+                        box-shadow var(--hzy-t-base) ease, background var(--hzy-t-base) ease;
+        }
+        .character-card:hover,
+        .market-card:hover {
+            border-color: var(--accent-color);
+            box-shadow: var(--hzy-shadow-2);
+        }
+        .market-card-icon {
+            line-height: 1;
+        }
+        .market-chat-btn {
+            border-radius: var(--hzy-r-sm);
+        }
+        .gen-history-item:hover {
+            border-color: var(--accent-color);
+            background: var(--hover-bg);
+        }
+        .gen-history-item pre {
+            font-family: var(--hzy-font-mono);
+            font-size: 12px;
+            line-height: 1.55;
+            border: 1px solid var(--border-color);
+            border-radius: var(--hzy-r-sm);
+        }
+        .gen-history-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .draw-history-item {
+            border-radius: var(--hzy-r-sm);
+            transition: border-color var(--hzy-t-fast) ease, transform var(--hzy-t-fast) ease,
+                        box-shadow var(--hzy-t-fast) ease;
+        }
+        .draw-history-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hzy-shadow-2);
+        }
+        .lv-thumbnails img {
+            border-radius: var(--hzy-r-sm);
+            transition: border-color var(--hzy-t-fast) ease, transform var(--hzy-t-fast) ease;
+        }
+        .lv-thumbnails img:hover {
+            transform: translateY(-2px);
+        }
+        .stats-panel {
+            border-radius: var(--hzy-r-lg);
+            box-shadow: var(--hzy-shadow-1);
+        }
+        .stats-grid .stat-item {
+            border-radius: var(--hzy-r-md);
+            border: 1px solid var(--border-color);
+            transition: transform var(--hzy-t-base) ease, border-color var(--hzy-t-base) ease,
+                        background var(--hzy-t-base) ease;
+        }
+        .stats-grid .stat-item:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+        .model-usage-list .model-tag {
+            transition: border-color var(--hzy-t-fast) ease, color var(--hzy-t-fast) ease;
+        }
+        .model-usage-list .model-tag:hover {
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+        }
+        .info-section h3 {
+            letter-spacing: .01em;
+        }
+        .feature-list li {
+            transition: color var(--hzy-t-fast) ease, transform var(--hzy-t-fast) ease;
+        }
+        .feature-list li:hover {
+            color: var(--text-primary);
+            transform: translateX(2px);
+        }
+        .command-example {
+            font-family: var(--hzy-font-mono);
+            border: 1px solid var(--border-color);
+            border-radius: var(--hzy-r-sm);
+        }
+        .video-container {
+            border-radius: var(--hzy-r-md);
+            box-shadow: var(--hzy-shadow-1);
+        }
+        .voice-control-panel,
+        .character-modal-content input,
+        .character-modal-content textarea,
+        .character-modal-content select,
+        .lv-frame-btn,
+        .lv-mode-btn,
+        .lv-controls button {
+            transition: border-color var(--hzy-t-fast) ease, background var(--hzy-t-fast) ease,
+                        color var(--hzy-t-fast) ease, transform var(--hzy-t-fast) ease;
+        }
+        .lv-frame-btn:hover,
+        .lv-mode-btn:hover,
+        .lv-controls button:hover {
+            transform: translateY(-1px);
+        }
+        .lv-duration-display strong {
+            letter-spacing: .01em;
+        }
+        .lv-progress-bar {
+            height: 8px;
+            border-radius: 999px;
+        }
+        .lv-progress-bar #lvProgressFill {
+            border-radius: 999px;
+            transition: width var(--hzy-t-slow) var(--hzy-ease);
+        }
+
+        /* ============================================================
+           ⑧ 空状态 / 加载态：居中图标 + 次级说明文字
+           ============================================================ */
+        .draw-result-area,
+        .vision-result-area,
+        .task-result-area {
+            border-radius: var(--hzy-r-lg);
+            transition: border-color var(--hzy-t-base) ease, background var(--hzy-t-base) ease;
+        }
+        .draw-result-area .placeholder,
+        .vision-result-area .placeholder,
+        .task-result-area .placeholder {
+            color: var(--text-secondary);
+            font-size: 13.5px;
+            line-height: 1.8;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .draw-result-area .placeholder .icon,
+        .vision-result-area .placeholder .icon,
+        .task-result-area .placeholder .icon {
+            font-size: 44px;
+            margin-bottom: 8px;
+            opacity: .9;
+            filter: drop-shadow(0 8px 18px rgba(0,0,0,.35));
+        }
+        #compositePlaceholder {
+            line-height: 1.8;
+        }
+        #compositePlaceholder p {
+            margin: 4px 0 0;
+        }
+        .draw-result-area img,
+        .draw-result-area video {
+            border-radius: var(--hzy-r-md);
+            box-shadow: var(--hzy-shadow-3);
+        }
+        .loading-spinner .spinner,
+        .spinner {
+            border-color: var(--border-color);
+            border-top-color: var(--accent-color);
+            box-shadow: 0 0 0 1px var(--accent-color-alpha);
+            filter: drop-shadow(0 0 8px var(--accent-color-alpha));
+        }
+        .loading-text {
+            font-size: 13px;
+            letter-spacing: .02em;
+            color: var(--accent-color);
+            opacity: .95;
+        }
+
+        /* ============================================================
+           ⑨ 弹层 / 模态框：统一 pop-in 入场
+           ============================================================ */
+        @keyframes hzy-pop-in {
+            from { opacity: 0; transform: translateY(12px) scale(.965); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes hzy-fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .character-modal {
+            animation: hzy-fade-in var(--hzy-t-base) ease;
+            -webkit-backdrop-filter: blur(3px);
+            backdrop-filter: blur(3px);
+        }
+        .character-modal-content {
+            border-radius: var(--hzy-r-xl);
+            box-shadow: var(--hzy-shadow-3);
+            animation: hzy-pop-in var(--hzy-t-slow) var(--hzy-ease);
+        }
+        .character-modal-content input,
+        .character-modal-content textarea,
+        .character-modal-content select {
+            border-radius: var(--hzy-r-md);
+        }
+        .character-modal-content .modal-actions button {
+            border-radius: var(--hzy-r-sm);
+        }
+        #appealModal {
+            animation: hzy-fade-in var(--hzy-t-base) ease;
+            -webkit-backdrop-filter: blur(3px);
+            backdrop-filter: blur(3px);
+        }
+        #appealModal > div {
+            border-radius: var(--hzy-r-lg) !important;
+            box-shadow: var(--hzy-shadow-3);
+            animation: hzy-pop-in var(--hzy-t-slow) var(--hzy-ease);
+        }
+        #appealModal button {
+            transition: transform var(--hzy-t-fast) ease, box-shadow var(--hzy-t-base) ease,
+                        filter var(--hzy-t-base) ease;
+        }
+        #appealModal button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.04);
+            box-shadow: var(--hzy-lift);
+        }
+
+        /* ============================================================
+           ⑩ 移动端：<640px 不出现横向滚动、按钮不重叠
+           ============================================================ */
+        @media (max-width: 768px) {
+            .menu-btn {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+            }
+            .mode-tabs {
+                padding-left: 54px;
+            }
+            .input-wrapper {
+                flex-wrap: wrap;
+                row-gap: 8px;
+                align-items: center;
+            }
+            .input-wrapper > textarea {
+                order: 1;
+                flex: 1 1 60%;
+                min-width: 0;
+            }
+            .input-wrapper > .send-btn {
+                order: 2;
+                flex: 0 0 auto;
+                margin-left: auto;
+            }
+            .input-wrapper > .voice-control-panel {
+                order: 3;
+                flex: 1 1 100%;
+                width: 100%;
+                justify-content: center;
+            }
+            .message-content {
+                max-width: 82%;
+                padding: 11px 14px;
+            }
+            .message-content > pre {
+                padding: 32px 12px 10px;
+            }
+        }
+        @media (max-width: 640px) {
+            html,
+            body {
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            .mode-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                overscroll-behavior-x: contain;
+                gap: 4px;
+                padding: 6px 10px 6px 52px;
+                scrollbar-width: none;
+            }
+            .mode-tabs::-webkit-scrollbar {
+                display: none;
+            }
+            .mode-tab {
+                flex: 0 0 auto;
+                padding: 6px 11px;
+                font-size: 12px;
+            }
+            .messages-area {
+                padding: 16px 12px 22px;
+            }
+            .message {
+                margin-bottom: 18px;
+            }
+            .message-content {
+                max-width: 86%;
+                font-size: 13.5px;
+                border-radius: 16px;
+            }
+            .message-avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 13px;
+            }
+            .message.user .message-avatar {
+                margin-left: 8px;
+            }
+            .message.assistant .message-avatar {
+                margin-right: 8px;
+            }
+            .input-area {
+                padding: 10px 12px 12px;
+            }
+            .input-wrapper {
+                padding: 6px 10px;
+                border-radius: var(--hzy-r-md);
+            }
+            .send-btn {
+                padding: 8px 14px;
+                font-size: 13px;
+            }
+            .chat-header,
+            .sync-bar {
+                padding: 10px 12px;
+            }
+            .daily-quote {
+                margin: 4px 12px 0;
+                padding: 8px 12px;
+                font-size: 12.5px;
+            }
+            .draw-result-area,
+            .vision-result-area,
+            .task-result-area {
+                min-height: 180px;
+                padding: 14px;
+            }
+            .film-step,
+            .longvideo-settings,
+            .tts-panel,
+            .embed-panel,
+            .stats-panel {
+                padding: 14px;
+            }
+            .message-content pre > code {
+                font-size: 12px;
+            }
+            .message-content > pre:has(> code[class*="language-"])::before {
+                padding-left: 50px;
+            }
+            .conversation-title {
+                padding-right: 74px;
+            }
+            img,
+            video,
+            canvas,
+            iframe,
+            table {
+                max-width: 100%;
+            }
+        }
+
     </style>
     <link rel="stylesheet" href="/css/themes.css">
     <script src="/js/marked.min.js"></script>
