@@ -795,6 +795,448 @@
                 grid-template-columns: 1fr;
             }
         }
+        /* ============================================================
+           ✨ UI POLISH 层（与 index.html 保持同一套视觉语言）
+           纯样式追加：不改任何 id / class / JS，过渡统一 .18s~.28s ease
+           ============================================================ */
+        :root {
+            --hzy-r-sm: 8px;
+            --hzy-r-md: 12px;
+            --hzy-r-lg: 16px;
+            --hzy-r-xl: 22px;
+            --hzy-ease: cubic-bezier(.22, .61, .36, 1);
+            --hzy-t-fast: .18s;
+            --hzy-t-base: .22s;
+            --hzy-t-slow: .28s;
+            --hzy-font-mono: 'Cascadia Mono', 'JetBrains Mono', 'Consolas', 'SFMono-Regular', Menlo, monospace;
+            --hzy-shadow-1: 0 1px 2px rgba(0,0,0,.20), 0 2px 8px rgba(0,0,0,.14);
+            --hzy-shadow-2: 0 6px 18px rgba(0,0,0,.26), 0 2px 6px rgba(0,0,0,.16);
+            --hzy-shadow-3: 0 18px 44px rgba(0,0,0,.45);
+            --hzy-glow: 0 0 0 3px var(--accent-color, #ffd700), 0 0 16px -4px var(--accent-color, #ffd700);
+            --hzy-lift: 0 6px 18px -8px var(--accent-color, #ffd700), 0 2px 8px rgba(0,0,0,.28);
+            --hzy-scroll: rgba(255,255,255,.15);
+            --hzy-scroll-hover: rgba(255,255,255,.32);
+            --hzy-code-bar: rgba(255,255,255,.055);
+        }
+        [data-theme="light"] {
+            --hzy-shadow-1: 0 1px 2px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.05);
+            --hzy-shadow-2: 0 6px 18px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.06);
+            --hzy-shadow-3: 0 18px 44px rgba(0,0,0,.18);
+            --hzy-lift: 0 6px 16px -8px var(--accent-color, #b8860b), 0 2px 6px rgba(0,0,0,.10);
+            --hzy-scroll: rgba(0,0,0,.16);
+            --hzy-scroll-hover: rgba(0,0,0,.34);
+            --hzy-code-bar: rgba(0,0,0,.045);
+        }
+        ::selection {
+            background: var(--accent-color, #ffd700);
+            color: var(--bg-primary, #1a1a2e);
+        }
+        /* 滚动条：细窄、半透明、悬停加深 */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--hzy-scroll-hover) transparent;
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: var(--hzy-scroll);
+            background-clip: padding-box;
+            border: 2px solid transparent;
+            border-radius: 999px;
+            transition: background var(--hzy-t-fast) ease;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: var(--hzy-scroll-hover); background-clip: padding-box; }
+        ::-webkit-scrollbar-corner { background: transparent; }
+
+        /* 焦点：金色描边光晕 */
+        .login-card input:focus,
+        .fetch-controls input:focus,
+        .fetch-controls select:focus,
+        .login-card textarea:focus {
+            outline: none;
+            border-color: var(--accent-color, #ffd700);
+            box-shadow: var(--hzy-glow);
+        }
+        .login-card input { transition: border-color var(--hzy-t-fast) ease, box-shadow var(--hzy-t-fast) ease; }
+        .login-card {
+            border-radius: var(--hzy-r-xl);
+            box-shadow: var(--hzy-shadow-3);
+            animation: hzy-pop-in var(--hzy-t-slow) var(--hzy-ease);
+        }
+        .slider-container, .slider-progress, .slider-thumb { border-radius: var(--hzy-r-md); }
+
+        /* 顶部导航与 Tab */
+        .app-header {
+            border-radius: var(--hzy-r-lg);
+            box-shadow: var(--hzy-shadow-1);
+        }
+        .app-header .logout-btn {
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            transition: background var(--hzy-t-fast) ease, color var(--hzy-t-fast) ease,
+                        border-color var(--hzy-t-fast) ease, transform var(--hzy-t-fast) ease;
+        }
+        .app-header .logout-btn:hover {
+            background: var(--accent-color-alpha, rgba(255,215,0,0.12));
+            border-color: var(--danger, #dc3545);
+            transform: translateY(-1px);
+        }
+        .tabs {
+            border-radius: 999px;
+            padding: 5px;
+        }
+        .tab-btn {
+            border: 1px solid transparent;
+            border-radius: 999px;
+            transition: background var(--hzy-t-base) ease, color var(--hzy-t-base) ease,
+                        border-color var(--hzy-t-base) ease, transform var(--hzy-t-fast) ease,
+                        box-shadow var(--hzy-t-base) ease;
+        }
+        .tab-btn:hover {
+            background: var(--hover-bg, rgba(255,255,255,0.07));
+            border-color: var(--border-color, #2a2a3e);
+            transform: translateY(-1px);
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--accent-color, #ffd700) 0%, var(--accent-hover, #ffb347) 100%);
+            border-color: var(--accent-color, #ffd700);
+            box-shadow: 0 2px 12px -4px var(--accent-color, #ffd700);
+        }
+
+        /* 面板与卡片 */
+        .fetch-section,
+        .conv-selector,
+        .message-preview,
+        .public-chats,
+        .character-share-section {
+            border-radius: var(--hzy-r-lg);
+        }
+        .conv-item {
+            border: 1px solid transparent;
+            border-left: 3px solid transparent;
+            border-radius: var(--hzy-r-md);
+            transition: background var(--hzy-t-base) ease, border-color var(--hzy-t-base) ease,
+                        transform var(--hzy-t-base) ease, box-shadow var(--hzy-t-base) ease;
+        }
+        .conv-item:hover {
+            background: var(--bg-tertiary, #0f0f1a);
+            border-color: var(--border-color, #2a2a3e);
+            transform: translateX(2px);
+        }
+        .conv-item.selected {
+            background: linear-gradient(90deg, var(--accent-color-alpha, rgba(255,215,0,0.12)), transparent 85%);
+            border-color: transparent;
+            border-left-color: var(--accent-color, #ffd700);
+            box-shadow: inset 0 0 0 1px var(--accent-color-alpha, rgba(255,215,0,0.12));
+        }
+        .msg-item {
+            border: 1px solid transparent;
+            border-radius: var(--hzy-r-md);
+            transition: background var(--hzy-t-base) ease, border-color var(--hzy-t-base) ease,
+                        box-shadow var(--hzy-t-base) ease;
+        }
+        .msg-item:hover {
+            background: var(--bg-tertiary, #0f0f1a);
+            border-color: var(--border-color, #2a2a3e);
+        }
+        .msg-item .msg-avatar { box-shadow: 0 0 0 1px var(--border-color, #2a2a3e); }
+        .msg-item .msg-avatar.assistant {
+            box-shadow: 0 0 0 1px var(--accent-color, #ffd700), 0 2px 10px -4px var(--accent-color, #ffd700);
+        }
+        .msg-item .msg-check { border-radius: 6px; }
+        .public-card,
+        .public-char-card {
+            border-radius: var(--hzy-r-lg);
+            transition: border-color var(--hzy-t-base) ease, transform var(--hzy-t-base) ease,
+                        box-shadow var(--hzy-t-base) ease;
+        }
+        .public-card:hover,
+        .public-char-card:hover { box-shadow: var(--hzy-shadow-2); }
+        .public-card .card-title .badge {
+            background: var(--accent-color-alpha, rgba(255,215,0,0.15));
+            border: 1px solid var(--border-color, #2a2a3e);
+        }
+        .publish-char-list .char-item { border-radius: var(--hzy-r-sm); }
+        .message-preview .toggle-all {
+            transition: border-color var(--hzy-t-fast) ease, color var(--hzy-t-fast) ease, background var(--hzy-t-fast) ease;
+        }
+
+        /* 空状态：居中图标 + 次级说明文字 */
+        .empty-state {
+            color: var(--text-secondary, #aaa);
+            font-size: 13.5px;
+            line-height: 1.8;
+        }
+        .empty-state .icon {
+            font-size: 46px;
+            opacity: .9;
+            filter: drop-shadow(0 8px 18px rgba(0,0,0,.35));
+        }
+        .loading-spinner {
+            box-shadow: 0 0 0 1px var(--accent-color-alpha, rgba(255,215,0,0.12));
+            filter: drop-shadow(0 0 8px var(--accent-color-alpha, rgba(255,215,0,0.12)));
+        }
+
+        /* 消息正文：markdown 间距 / 代码块工具条 / 表格 / 引用 / 链接 */
+        .msg-item .msg-content .msg-text pre,
+        .public-detail-body .detail-msg .d-content pre {
+            position: relative;
+            padding: 32px 12px 10px;
+            background: var(--bg-tertiary, #0f0f1a);
+            background-image: linear-gradient(var(--hzy-code-bar), var(--hzy-code-bar));
+            background-repeat: no-repeat;
+            background-size: 100% 28px;
+            border: 1px solid var(--border-color, #2a2a3e);
+            border-radius: var(--hzy-r-md);
+            overflow-x: auto;
+            overscroll-behavior-x: contain;
+            box-shadow: var(--hzy-shadow-1);
+            margin: 6px 0;
+        }
+        .msg-item .msg-content .msg-text pre::after,
+        .public-detail-body .detail-msg .d-content pre::after {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: 12px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-color, #ffd700);
+            box-shadow: 14px 0 0 var(--accent-hover, #ffb347), 28px 0 0 var(--success, #2ecc71);
+            opacity: .8;
+            pointer-events: none;
+        }
+        .msg-item .msg-content .msg-text pre:has(> code[class*="language-"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class*="language-"])::before {
+            content: "CODE";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            padding-left: 52px;
+            font-family: var(--hzy-font-mono);
+            font-size: 11px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--text-muted, #888);
+            border-bottom: 1px solid var(--border-color, #2a2a3e);
+            pointer-events: none;
+        }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-html"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-html"])::before { content: "HTML"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-css"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-css"])::before { content: "CSS"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-javascript"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-javascript"])::before { content: "JavaScript"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-js"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-js"])::before { content: "JavaScript"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-typescript"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-typescript"])::before { content: "TypeScript"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-ts"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-ts"])::before { content: "TypeScript"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-python"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-python"])::before { content: "Python"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-py"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-py"])::before { content: "Python"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-java"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-java"])::before { content: "Java"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-cpp"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-cpp"])::before { content: "C++"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-c"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-c"])::before { content: "C"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-go"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-go"])::before { content: "Go"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-rust"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-rust"])::before { content: "Rust"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-sql"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-sql"])::before { content: "SQL"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-json"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-json"])::before { content: "JSON"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-bash"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-bash"])::before { content: "Bash"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-sh"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-sh"])::before { content: "Shell"; }
+        .msg-item .msg-content .msg-text pre:has(> code[class~="language-markdown"])::before,
+        .public-detail-body .detail-msg .d-content pre:has(> code[class~="language-markdown"])::before { content: "Markdown"; }
+        .msg-item .msg-content .msg-text pre > code,
+        .public-detail-body .detail-msg .d-content pre > code {
+            display: block;
+            background: transparent;
+            padding: 0;
+            font-family: var(--hzy-font-mono);
+            font-size: 12.5px;
+            line-height: 1.6;
+            white-space: pre;
+            tab-size: 4;
+        }
+        .msg-item .msg-content .msg-text h1,
+        .d-content h1 { font-size: 1.3em; }
+        .msg-item .msg-content .msg-text h1,
+        .msg-item .msg-content .msg-text h2,
+        .msg-item .msg-content .msg-text h3,
+        .public-detail-body .detail-msg .d-content h1,
+        .public-detail-body .detail-msg .d-content h2,
+        .public-detail-body .detail-msg .d-content h3 {
+            margin: 12px 0 8px;
+            color: var(--text-primary, #fff);
+            line-height: 1.35;
+        }
+        .msg-item .msg-content .msg-text p,
+        .public-detail-body .detail-msg .d-content p { margin: 0 0 8px; }
+        .msg-item .msg-content .msg-text ul,
+        .msg-item .msg-content .msg-text ol,
+        .public-detail-body .detail-msg .d-content ul,
+        .public-detail-body .detail-msg .d-content ol { margin: 0 0 8px; padding-left: 22px; }
+        .msg-item .msg-content .msg-text li::marker,
+        .public-detail-body .detail-msg .d-content li::marker { color: var(--accent-color, #ffd700); }
+        .msg-item .msg-content .msg-text blockquote,
+        .public-detail-body .detail-msg .d-content blockquote {
+            margin: 0 0 8px;
+            padding: 8px 14px;
+            background: var(--hover-bg, rgba(255,255,255,0.07));
+            border-left: 3px solid var(--accent-color, #ffd700);
+            border-radius: 0 var(--hzy-r-sm) var(--hzy-r-sm) 0;
+            color: var(--text-secondary, #aaa);
+            font-style: italic;
+        }
+        .msg-item .msg-content .msg-text table,
+        .public-detail-body .detail-msg .d-content table {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border-color, #2a2a3e);
+            border-collapse: collapse;
+            border-radius: var(--hzy-r-sm);
+            font-size: 13px;
+            margin: 0 0 10px;
+        }
+        .msg-item .msg-content .msg-text th,
+        .msg-item .msg-content .msg-text td,
+        .public-detail-body .detail-msg .d-content th,
+        .public-detail-body .detail-msg .d-content td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border-color, #2a2a3e);
+            text-align: left;
+        }
+        .msg-item .msg-content .msg-text th,
+        .public-detail-body .detail-msg .d-content th {
+            background: var(--hover-bg, rgba(255,255,255,0.07));
+            color: var(--accent-color, #ffd700);
+            font-weight: 600;
+        }
+        .msg-item .msg-content .msg-text a,
+        .public-detail-body .detail-msg .d-content a {
+            color: var(--accent-color, #ffd700);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color var(--hzy-t-fast) ease;
+        }
+        .msg-item .msg-content .msg-text a:hover,
+        .public-detail-body .detail-msg .d-content a:hover { border-bottom-color: var(--accent-color, #ffd700); }
+        .msg-item .msg-content .msg-text :not(pre) > code,
+        .public-detail-body .detail-msg .d-content :not(pre) > code {
+            background: var(--hover-bg, rgba(255,255,255,0.07));
+            border: 1px solid var(--border-color, #2a2a3e);
+            border-radius: 6px;
+            padding: 1px 6px;
+            font-family: var(--hzy-font-mono);
+            color: var(--accent-color, #ffd700);
+        }
+        .msg-item .msg-content .msg-text img,
+        .msg-item .msg-content .msg-text video,
+        .public-detail-body .detail-msg .d-content img,
+        .public-detail-body .detail-msg .d-content video {
+            border-radius: var(--hzy-r-md);
+            border: 1px solid var(--border-color, #2a2a3e);
+            box-shadow: var(--hzy-shadow-1);
+        }
+
+        /* 按钮：悬停抬升 + 禁用态清晰 */
+        .fetch-controls button,
+        .publish-char-btn,
+        .public-char-card .char-actions button {
+            transition: transform var(--hzy-t-fast) ease, box-shadow var(--hzy-t-base) ease,
+                        filter var(--hzy-t-base) ease, opacity var(--hzy-t-fast) ease;
+        }
+        .fetch-controls button:hover:not(:disabled),
+        .publish-char-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: var(--hzy-lift);
+            filter: brightness(1.05);
+        }
+        .fetch-controls button:disabled,
+        .publish-char-btn:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+            filter: grayscale(.45);
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* 弹层：统一 pop-in */
+        @keyframes hzy-pop-in {
+            from { opacity: 0; transform: translateY(12px) scale(.965); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes hzy-fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .public-detail-modal {
+            animation: hzy-fade-in var(--hzy-t-base) ease;
+            -webkit-backdrop-filter: blur(3px);
+            backdrop-filter: blur(3px);
+        }
+        .public-detail-content {
+            border-radius: var(--hzy-r-xl);
+            box-shadow: var(--hzy-shadow-3);
+            animation: hzy-pop-in var(--hzy-t-slow) var(--hzy-ease);
+        }
+        .public-detail-header .close-btn {
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            font-size: 20px;
+            line-height: 1;
+            transition: background var(--hzy-t-fast) ease, color var(--hzy-t-fast) ease,
+                        border-color var(--hzy-t-fast) ease, transform var(--hzy-t-fast) ease;
+        }
+        .public-detail-header .close-btn:hover {
+            background: var(--accent-color-alpha, rgba(255,215,0,0.12));
+            border-color: var(--danger, #dc3545);
+            transform: translateY(-1px);
+        }
+
+        /* 移动端：不出现横向滚动 */
+        @media (max-width: 768px) {
+            html,
+            body {
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            .app { padding: 12px; }
+            .tabs { padding: 4px; gap: 4px; }
+            .tab-btn { border-radius: 999px; }
+            .msg-item .msg-content .msg-text pre,
+            .public-detail-body .detail-msg .d-content pre { padding: 30px 10px 10px; }
+            img, video, canvas, iframe, table { max-width: 100%; }
+        }
     </style>
     <!-- 引入 Marked 和 Highlight.js -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
