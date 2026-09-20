@@ -7632,7 +7632,7 @@
                 });
                 const data = await response.json().catch(() => ({}));
                 // Cloudflare 语音合成不可用时（如 melotts 侧 3043），回退浏览器朗读，避免红框报错
-                if (!response.ok || !data.audio) {
+                if (!response.ok || !data.audio || typeof data.audio !== 'string' || data.audio.length < 100) {
                     status.textContent = '⚠️ 云端合成暂不可用，已切换为浏览器朗读';
                     ttsSpeakFallback(text);
                     return;
