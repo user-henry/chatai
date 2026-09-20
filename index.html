@@ -3950,6 +3950,9 @@
                     <label>输入要合成的文本：</label>
                     <textarea id="ttsText" rows="4" placeholder="输入要转换为语音的文字..." style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);"></textarea>
                     <div class="tts-row">
+                        <label>模型：
+                            <select id="ttsModelSelect"></select>
+                        </label>
                         <label>语言：
                             <select id="ttsLang">
                                 <option value="zh-CN">中文</option>
@@ -4598,6 +4601,52 @@
             return out;
         }
         const CF_MODEL_NAMES = cfModelsFlat();
+
+        // ============================================================
+        //  模型下拉完整性保障
+        //  硬编码的下拉容易与 CF_MODELS 走失（漏模型），这里在页面初始化时
+        //  自动把该分类下「下拉里还没有」的模型补进一个分组，保证每个模式的
+        //  模型选项卡都包含该模式可选的全部模型。
+        // ============================================================
+        const CF_CATEGORY_LABEL = {
+            text: '文本生成', code: '代码生成', image: '图像生成',
+            voice: '语音 / 音频', embedding: '向量嵌入', vision: '视觉理解',
+        };
+
+        function ensureModelsInSelect(selectId, category) {
+            const sel = document.getElementById(selectId);
+            const list = CF_MODELS[category];
+            if (!sel || !Array.isArray(list) || list.length === 0) return 0;
+            const existing = new Set(Array.prototype.map.call(sel.options, o => o.value));
+            const missing = list.filter(m => !existing.has(m.id));
+            // 移除上一次自动补的分组（模型清单可能已更新），再重新补
+            const old = sel.querySelector('optgroup[data-auto="1"]');
+            if (old) old.parentNode.removeChild(old);
+            if (missing.length === 0) return 0;
+            const group = document.createElement('optgroup');
+            group.label = '☁️ Cloudflare · ' + (CF_CATEGORY_LABEL[category] || '') + '（其余 ' + missing.length + ' 个）';
+            group.setAttribute('data-auto', '1');
+            missing.forEach(m => {
+                const o = document.createElement('option');
+                o.value = m.id;
+                o.textContent = m.name;
+                group.appendChild(o);
+            });
+            sel.appendChild(group);
+            return missing.length;
+        }
+
+        // 在页面初始化时统一补全。
+        // 注意：code / embedding 两个下拉由 fillCfSelect 在打开对应模式时动态填充
+        //（本就包含该分类全部模型），因此这里不重复处理，避免出现重复选项。
+        function ensureAllModelSelects() {
+            return {
+                chat: ensureModelsInSelect('chatModelSelect', 'text'),
+                image: ensureModelsInSelect('drawModelSelect', 'image'),
+                vision: ensureModelsInSelect('visionModelSelect', 'vision'),
+                voice: ensureModelsInSelect('ttsModelSelect', 'voice'),
+            };
+        }
 
         // ============================================================
         //  全局状态
@@ -7607,13 +7656,15 @@
             const text = document.getElementById('ttsText').value.trim();
             if (!text) { showToast('请输入要合成的文本', 'warning'); return; }
             const lang = document.getElementById('ttsLang').value;
+            const ttsModelSel = document.getElementById('ttsModelSelect');
+            const ttsModel = (ttsModelSel && ttsModelSel.value) || '@cf/myshell-ai/melotts';
             const status = document.getElementById('ttsStatus');
             status.textContent = '⏳ 正在合成语音...';
             try {
                 const response = await fetch(`${CF_WORKER_API}/tts`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ model: '@cf/myshell-ai/melotts', prompt: text, language: lang })
+                    body: JSON.stringify({ model: ttsModel, prompt: text, language: lang })
                 });
                 const data = await response.json().catch(() => ({}));
                 // Cloudflare 语音合成不可用时（如 melotts 侧 3043），回退浏览器朗读，避免红框报错
@@ -8672,6 +8723,14 @@ v1.0.0 (2026年3月)
         window.pullTasksFromGitHub = pullTasksFromGitHub;
 
         document.addEventListener('DOMContentLoaded', init);
+
+        // 页面就绪后补全各模式的模型下拉（保证每个选项卡都包含该模式全部可选模型）
+        document.addEventListener('DOMContentLoaded', function () {
+            try {
+                const filled = ensureAllModelSelects();
+                console.log('🧩 模型下拉补全:', JSON.stringify(filled));
+            } catch (e) { console.warn('模型下拉补全失败', e); }
+        });
 
         // ============================================================
         //  📊 Token 消耗与模型调用统计（本地存储）
