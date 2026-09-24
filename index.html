@@ -4027,11 +4027,11 @@
                 <div class="chat-header">
                     <div>
                         <h1>🎙️ 语音转文字</h1>
-                        <p>录音或上传音频文件，由 Cloudflare Whisper / Nova 识别为文字</p>
+                        <p>录音或上传音频文件，由 Cloudflare Whisper 识别为文字；也可用浏览器实时识别（不占额度）</p>
                     </div>
                     <div class="model-selector">
                         <label for="sttModelSelect">🧠 模型：</label>
-                        <select id="sttModelSelect"></select>
+                        <select id="sttModelSelect" onchange="updateSttModelHint()"></select>
                     </div>
                 </div>
                 <div class="stt-panel">
@@ -4054,8 +4054,10 @@
                         </label>
                         <button class="draw-generate-btn" id="sttRecordBtn" onclick="toggleSttRecording()">🎤 开始录音</button>
                         <button class="draw-generate-btn" id="sttRunBtn" onclick="runStt()" style="background:var(--accent-color);color:var(--bg-primary);">▶️ 开始识别</button>
+                        <button class="draw-generate-btn" id="sttLiveBtn" onclick="toggleSttLive()" style="background:var(--bg-tertiary);color:var(--text-primary);">🔊 浏览器实时识别</button>
                         <span id="sttStatus" class="sync-status"></span>
                     </div>
+                    <div id="sttModelHint" class="stt-preview-info" style="margin:-6px 0 10px;"></div>
 
                     <div class="stt-preview" id="sttPreviewBox">
                         <div class="stt-preview-info" id="sttFileInfo">尚未选择音频（可直接录音，或上传 wav / mp3 / m4a / webm 等格式）</div>
@@ -4713,12 +4715,15 @@
                 { id: '@cf/black-forest-labs/flux-1-schnell', name: 'FLUX.1 Schnell' },
                 { id: '@cf/leonardo/lucid-origin', name: 'Leonardo Lucid Origin' },
             ],
-            // 语音 / 音频合成（TTS）/ 语音识别（STT）/ 翻译
+            // 语音识别（STT）
+            //   · turbo     → 支持 language / task（中英日韩等），音频以 base64 传入，质量最好
+            //   · whisper   → 多语言自动检测（不支持指定语言参数）
+            //   · tiny-en   → 仅英文，速度最快
+            //   nova-3 已移除：AI 绑定下报 body,contentType 缺陷（workerd #5082），无法调用
             voice: [
-                { id: '@cf/openai/whisper', name: 'Whisper (语音识别)' },
-                { id: '@cf/openai/whisper-large-v3-turbo', name: 'Whisper Large v3 Turbo' },
-                { id: '@cf/openai/whisper-tiny-en', name: 'Whisper Tiny (英文)' },
-                { id: '@cf/deepgram/nova-3', name: 'Nova 3 (语音识别)' },
+                { id: '@cf/openai/whisper-large-v3-turbo', name: 'Whisper Large v3 Turbo（推荐 · 可指定语言）' },
+                { id: '@cf/openai/whisper', name: 'Whisper（多语言 · 自动检测）' },
+                { id: '@cf/openai/whisper-tiny-en', name: 'Whisper Tiny（仅英文 · 最快）' },
             ],
             // 语义嵌入 / 向量 / 重排序
             embedding: [
@@ -4942,7 +4947,7 @@
         }
 
         function genIcon(type) {
-            return ({ code: '💻', audio: '🎤', search: '🔎', image: '🎨', video: '🎬' })[type] || '📄';
+            return ({ code: '💻', audio: '🎤', search: '🔎', image: '🎨', video: '🎬', stt: '🎙️', translate: '🌐' })[type] || '📄';
         }
 
         function genItemHtml(r) {
@@ -4951,8 +4956,9 @@
                 preview = `<pre style="max-height:160px;overflow:auto;white-space:pre-wrap;">${escapeHtml((r.content || '').substring(0, 600))}</pre>`;
             } else if (r.type === 'audio') {
                 preview = r.url ? `<audio controls src="${r.url}" style="width:100%;"></audio>` : '';
-            } else if (r.type === 'search') {
-                preview = `<div style="font-size:12px;">${escapeHtml((r.content || '').substring(0, 300))}</div>`;
+            } else if (r.type === 'search' || r.type === 'stt' || r.type === 'translate') {
+                // 识别结果 / 译文都是纯文本，直接展示文字（可复制）
+                preview = `<div style="font-size:12px;max-height:160px;overflow:auto;white-space:pre-wrap;">${escapeHtml((r.content || '').substring(0, 600))}</div>`;
             } else {
                 preview = r.url ? `<img src="${r.url}" style="max-height:120px;border-radius:6px;">` : '';
             }
@@ -4967,10 +4973,17 @@
             </div>`;
         }
 
+        // 各功能历史列表容器（新增功能时把容器 id 补到这里即可）
+        const GEN_HISTORY_CONTAINERS = {
+            code: 'codeHistory',
+            search: 'searchHistory',
+            stt: 'sttHistory',
+            translate: 'translateHistory',
+        };
+
         function renderGenHistory(type) {
-            const container = document.getElementById(type === 'code' ? 'codeHistory' :
-                type === 'audio' ? 'ttsHistory' :
-                type === 'search' ? 'searchHistory' : null);
+            const id = GEN_HISTORY_CONTAINERS[type] || (type === 'audio' ? 'ttsHistory' : null);
+            const container = id ? document.getElementById(id) : null;
             if (!container) return;
             const items = genHistory.filter(r => r.type === type);
             container.innerHTML = items.length === 0 ?
@@ -4979,9 +4992,8 @@
         }
 
         function renderAllGenHistory() {
-            renderGenHistory('code');
+            Object.keys(GEN_HISTORY_CONTAINERS).forEach(t => renderGenHistory(t));
             renderGenHistory('audio');
-            renderGenHistory('search');
         }
 
         async function pullGenFromGitHub() {
@@ -7790,12 +7802,28 @@
         // ============================================================
         // ============================================================
         //  🎙️ 语音转文字（STT）
-        //  支持浏览器录音（MediaRecorder）或上传音频文件，交给 Cloudflare Whisper / Nova 识别为文本。
+        //  两条通路：
+        //    1) 云端：录音（MediaRecorder）或上传音频 → Cloudflare Whisper（消耗免费额度）
+        //       · whisper-large-v3-turbo   支持 language / task，音频以 base64 传入
+        //       · whisper / whisper-tiny-en 只接受 0-255 字节数组，且不接受 language 参数
+        //         （前端统一发 base64 data URL，由 worker 按模型自行转换）
+        //    2) 浏览器实时识别（Web Speech API）：边说边出字，不消耗任何额度
         // ============================================================
         let sttRecorder = null;
         let sttChunks = [];
         let sttAudioData = null;   // data URL（data:audio/...;base64,...）
         let sttRecording = false;
+        let sttLiveRec = null;     // Web Speech 实时识别实例
+        let sttLiveFinal = '';
+        let sttLiveInterim = '';
+        let sttConvertedNote = '';  // 音频规整说明（原始大小 → 16kHz 单声道 WAV 大小）
+
+        // 各模型的参数支持情况（与 worker 的 STT_AUDIO_STYLE 保持一致）
+        const STT_MODEL_CAPS = {
+            '@cf/openai/whisper-large-v3-turbo': { lang: true, note: '支持指定识别语言，识别质量最好' },
+            '@cf/openai/whisper': { lang: false, note: '自动检测语言：云端识别会忽略「识别语言」（该选项仍用于浏览器实时识别）' },
+            '@cf/openai/whisper-tiny-en': { lang: false, note: '仅支持英文，速度最快（中文等其它语言无法识别）' },
+        };
 
         function initSttMode() {
             const sel = document.getElementById('sttModelSelect');
@@ -7803,9 +7831,107 @@
                 fillCfSelect(sel, CF_MODELS.voice, CF_MODELS.voice[0].id);
                 sel.dataset.filled = '1';
             }
+            updateSttModelHint();
         }
 
-        function handleSttFile(input) {
+        // 模型能力提示：语言选择对所选模型是否生效、是否只支持英文
+        // 注意：语言下拉始终可操作 —— 它同时控制「浏览器实时识别」的语种；
+        //       对于不支持 language 参数的模型，只做提示（worker 会忽略该参数）。
+        function updateSttModelHint() {
+            const sel = document.getElementById('sttModelSelect');
+            const hint = document.getElementById('sttModelHint');
+            if (!sel || !hint) return;
+            const cap = STT_MODEL_CAPS[sel.value] || { lang: false, note: '' };
+            hint.textContent = cap.note ? 'ℹ️ ' + cap.note : '';
+            const langSel = document.getElementById('sttLang');
+            if (langSel) {
+                langSel.style.opacity = cap.lang ? '1' : '.55';
+                langSel.title = cap.lang ? '云端识别将按所选语言识别' : '该模型不支持指定语言（自动检测）；此选项仍用于浏览器实时识别';
+            }
+        }
+
+        // ---------- 客户端音频规整 ----------
+        // 录音（webm/opus）与 wav 统一转成 16kHz 单声道 WAV：
+        //   · 保证 Cloudflare Whisper 一定能解码
+        //   · 16kHz 单声道比原始 wav 小 5 倍以上，上传更快
+        // 压缩格式（mp3 / m4a / ogg / flac）保持原样，避免转码后体积反而变大。
+        function encodeWav16k(float32, sampleRate) {
+            const len = float32.length;
+            const view = new DataView(new ArrayBuffer(44 + len * 2));
+            const wStr = function (off, s) { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); };
+            wStr(0, 'RIFF');
+            view.setUint32(4, 36 + len * 2, true);
+            wStr(8, 'WAVE'); wStr(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);          // PCM
+            view.setUint16(22, 1, true);          // 单声道
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);         // 16bit
+            wStr(36, 'data');
+            view.setUint32(40, len * 2, true);
+            let off = 44;
+            for (let i = 0; i < len; i++) {
+                const s = Math.max(-1, Math.min(1, float32[i]));
+                view.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+                off += 2;
+            }
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+        async function toWav16kMono(arrayBuffer) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+            if (!AC || !OC) return null;
+            const ctx = new AC();
+            let decoded;
+            try {
+                decoded = await ctx.decodeAudioData(arrayBuffer.slice(0));
+            } finally {
+                if (ctx.close) { try { ctx.close(); } catch (e) { /* 忽略 */ } }
+            }
+            const rate = 16000;
+            const frames = Math.max(1, Math.ceil(decoded.duration * rate));
+            const off = new OC(1, frames, rate);
+            const src = off.createBufferSource();
+            src.buffer = decoded;
+            src.connect(off.destination);
+            src.start(0);
+            const rendered = await off.startRendering();
+            return encodeWav16k(rendered.getChannelData(0), rate);
+        }
+
+        function blobToDataUrl(blob) {
+            return new Promise(function (resolve, reject) {
+                const fr = new FileReader();
+                fr.onload = function (e) { resolve(e.target.result); };
+                fr.onerror = reject;
+                fr.readAsDataURL(blob);
+            });
+        }
+
+        // 把「原始音频 Blob」规整成可直接上传的 data URL
+        async function prepareSttAudio(blob, name) {
+            const lower = (name || '').toLowerCase();
+            const mime = blob.type || '';
+            const isWav = /wav/.test(lower) || /wav/.test(mime);
+            const isRaw = /webm|ogg|opus/.test(lower) || /webm|ogg|opus/.test(mime);
+            sttConvertedNote = '';
+            if (!isWav && !isRaw) return await blobToDataUrl(blob);   // mp3/m4a/flac 等压缩格式直接用原文件
+            try {
+                const wav = await toWav16kMono(await blob.arrayBuffer());
+                if (wav && wav.size && wav.size < blob.size) {
+                    sttConvertedNote = Math.round(blob.size / 1024) + ' KB → ' + Math.round(wav.size / 1024) + ' KB（16kHz 单声道）';
+                    return await blobToDataUrl(wav);
+                }
+            } catch (e) {
+                console.warn('音频转码失败，改用原始数据：', e);
+            }
+            return await blobToDataUrl(blob);
+        }
+
+        async function handleSttFile(input) {
             const file = input.files && input.files[0];
             if (!file) return;
             if (!/^audio\//.test(file.type) && !/\.(wav|mp3|m4a|webm|ogg|flac|aac|opus)$/i.test(file.name)) {
@@ -7813,17 +7939,23 @@
                 return;
             }
             if (file.size > 20 * 1024 * 1024) { showToast('音频过大（20MB 以内）', 'warning'); return; }
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                sttAudioData = e.target.result;
-                const info = document.getElementById('sttFileInfo');
-                info.textContent = '已选择：' + file.name + '（' + Math.round(file.size / 1024) + ' KB）';
-                const player = document.getElementById('sttAudioPlayer');
-                player.src = sttAudioData;
-                player.style.display = 'block';
-                showToast('音频已就绪，点击「开始识别」', 'success');
-            };
-            reader.readAsDataURL(file);
+            if (sttRecording) { showToast('正在录音，请先停止录音', 'warning'); return; }
+            stopSttLive();
+            const info = document.getElementById('sttFileInfo');
+            info.textContent = '正在解析音频…';
+            try {
+                sttAudioData = await prepareSttAudio(file, file.name);
+            } catch (e) {
+                info.textContent = '音频读取失败：' + (e.message || e);
+                showToast('音频读取失败', 'error');
+                return;
+            }
+            info.textContent = '已选择：' + file.name + '（' + Math.round(file.size / 1024) + ' KB）'
+                + (sttConvertedNote ? ' · ' + sttConvertedNote : '');
+            const player = document.getElementById('sttAudioPlayer');
+            player.src = sttAudioData;
+            player.style.display = 'block';
+            showToast('音频已就绪，点击「开始识别」', 'success');
         }
 
         async function toggleSttRecording() {
@@ -7837,30 +7969,35 @@
                 showToast('当前浏览器不支持录音，请改用「上传音频」', 'error');
                 return;
             }
+            stopSttLive();
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 sttChunks = [];
                 sttRecorder = new MediaRecorder(stream);
                 sttRecorder.ondataavailable = function (e) { if (e.data && e.data.size > 0) sttChunks.push(e.data); };
-                sttRecorder.onstop = function () {
+                sttRecorder.onstop = async function () {
                     stream.getTracks().forEach(function (t) { t.stop(); });
                     sttRecording = false;
                     btn.textContent = '🎤 开始录音';
                     btn.classList.remove('recording');
-                    status.textContent = '';
                     const type = (sttChunks[0] && sttChunks[0].type) || 'audio/webm';
                     const blob = new Blob(sttChunks, { type: type });
-                    if (blob.size === 0) { showToast('没有录到音频，请重试', 'warning'); return; }
-                    const reader = new FileReader();
-                    reader.onload = function (ev) {
-                        sttAudioData = ev.target.result;
-                        document.getElementById('sttFileInfo').textContent = '录音完成（' + Math.round(blob.size / 1024) + ' KB）';
-                        const player = document.getElementById('sttAudioPlayer');
-                        player.src = sttAudioData;
-                        player.style.display = 'block';
-                        showToast('录音完成，点击「开始识别」', 'success');
-                    };
-                    reader.readAsDataURL(blob);
+                    if (blob.size === 0) { status.textContent = ''; showToast('没有录到音频，请重试', 'warning'); return; }
+                    status.textContent = '⏳ 正在处理录音…';
+                    try {
+                        sttAudioData = await prepareSttAudio(blob, 'record.webm');
+                    } catch (e) {
+                        status.textContent = '';
+                        showToast('录音处理失败：' + (e.message || e), 'error');
+                        return;
+                    }
+                    status.textContent = '';
+                    document.getElementById('sttFileInfo').textContent = '录音完成（' + Math.round(blob.size / 1024) + ' KB）'
+                        + (sttConvertedNote ? ' · ' + sttConvertedNote : '');
+                    const player = document.getElementById('sttAudioPlayer');
+                    player.src = sttAudioData;
+                    player.style.display = 'block';
+                    showToast('录音完成，点击「开始识别」', 'success');
                 };
                 sttRecorder.start();
                 sttRecording = true;
@@ -7872,10 +8009,90 @@
             }
         }
 
+        // ---------- 浏览器实时识别（Web Speech API，免费、不占额度）----------
+        // 适合「边说边出字」；Edge / Chrome 效果较好，其它浏览器可能不可用。
+        function sttLiveLang() {
+            const v = document.getElementById('sttLang').value;
+            const map = { zh: 'zh-CN', en: 'en-US', ja: 'ja-JP', ko: 'ko-KR', fr: 'fr-FR', de: 'de-DE', es: 'es-ES', ru: 'ru-RU' };
+            return map[v] || 'zh-CN';
+        }
+
+        function toggleSttLive() {
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const btn = document.getElementById('sttLiveBtn');
+            const status = document.getElementById('sttStatus');
+            const out = document.getElementById('sttOutput');
+            if (sttLiveRec) { stopSttLive(); return; }
+            if (!SR) {
+                showToast('当前浏览器不支持实时识别（建议使用 Edge / Chrome），请改用「开始录音」', 'warning');
+                return;
+            }
+            if (sttRecording) { showToast('正在录音，请先停止录音', 'warning'); return; }
+            try {
+                sttLiveFinal = out.value ? out.value.replace(/\s*$/, '') + ' ' : '';
+                sttLiveInterim = '';
+                const rec = new SR();
+                rec.lang = sttLiveLang();
+                rec.continuous = true;
+                rec.interimResults = true;
+                rec.maxAlternatives = 1;
+                rec.onstart = function () {
+                    btn.textContent = '⏹ 结束实时识别';
+                    btn.style.background = 'var(--danger, #e74c3c)';
+                    btn.style.color = '#fff';
+                    status.textContent = '🔴 实时识别中（' + rec.lang + '）…请对着麦克风说话';
+                };
+                rec.onresult = function (event) {
+                    let fin = '', interim = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const r = event.results[i];
+                        if (r.isFinal) fin += r[0].transcript; else interim += r[0].transcript;
+                    }
+                    if (fin) sttLiveFinal += fin;
+                    sttLiveInterim = interim;
+                    out.value = sttLiveFinal + sttLiveInterim;
+                    out.scrollTop = out.scrollHeight;
+                };
+                rec.onerror = function (event) {
+                    if (event.error === 'not-allowed') showToast('请允许浏览器访问麦克风', 'error');
+                    else if (event.error === 'no-speech') status.textContent = '未检测到语音，请再说一次…';
+                    else if (event.error !== 'aborted') status.textContent = '识别错误：' + event.error;
+                };
+                rec.onend = function () {
+                    if (sttLiveRec !== rec) return;
+                    if (sttLiveInterim) { sttLiveFinal += sttLiveInterim; sttLiveInterim = ''; out.value = sttLiveFinal; }
+                    stopSttLive();
+                    const text = out.value.trim();
+                    status.textContent = '✅ 实时识别结束（本次 ' + text.length + ' 字）';
+                    if (text) { addGenRecord('stt', { title: text.slice(0, 40), content: text }); renderGenHistory('stt'); }
+                };
+                rec.start();
+                sttLiveRec = rec;
+            } catch (e) {
+                showToast('启动实时识别失败：' + (e.message || e), 'error');
+                stopSttLive();
+            }
+        }
+
+        function stopSttLive() {
+            const btn = document.getElementById('sttLiveBtn');
+            if (sttLiveRec) {
+                const rec = sttLiveRec;
+                sttLiveRec = null;   // 先置空，避免 onend 里递归调用
+                try { rec.stop(); } catch (e) { /* 忽略 */ }
+            }
+            if (btn) {
+                btn.textContent = '🔊 浏览器实时识别';
+                btn.style.background = 'var(--bg-tertiary)';
+                btn.style.color = 'var(--text-primary)';
+            }
+        }
+
         async function runStt() {
             if (!sttAudioData) { showToast('请先录音或上传音频文件', 'warning'); return; }
             const model = document.getElementById('sttModelSelect').value;
-            const lang = document.getElementById('sttLang').value;
+            const cap = STT_MODEL_CAPS[model] || {};
+            const lang = cap.lang ? document.getElementById('sttLang').value : '';
             const status = document.getElementById('sttStatus');
             const out = document.getElementById('sttOutput');
             const btn = document.getElementById('sttRunBtn');
@@ -7894,15 +8111,24 @@
                 const data = await r.json().catch(function () { return {}; });
                 if (!r.ok || data.error) throw new Error(data.error || ('识别失败 (HTTP ' + r.status + ')'));
                 const text = data.text || '';
-                out.value = text || '（未识别到文本，可能是音频过短或格式不受支持）';
-                status.textContent = '✅ 识别完成' + (text ? '' : '（无文本）');
+                out.value = text || '（未识别到文本：可能是音频过短、没有语音，或格式不受支持）';
+                const stats = [];
+                if (text) stats.push(text.length + ' 字');
+                if (data.elapsedMs) stats.push((data.elapsedMs / 1000).toFixed(1) + ' 秒');
+                if (data.language) stats.push('语种 ' + data.language);
+                status.textContent = (text ? '✅ 识别完成' : '⚠️ 未识别到文本') + (stats.length ? '（' + stats.join(' · ') + '）' : '');
                 if (text) {
                     addGenRecord('stt', { title: text.slice(0, 40), content: text });
                     renderGenHistory('stt');
                 }
             } catch (e) {
-                status.textContent = '❌ ' + (e.message || '识别失败');
-                showToast('识别失败：' + (e.message || e), 'error');
+                const msg = e.message || '识别失败';
+                status.textContent = '❌ ' + msg;
+                if (/额度|4006/.test(msg)) {
+                    showToast('Cloudflare 免费额度已用完，可点「浏览器实时识别」直接说话转文字', 'warning');
+                } else {
+                    showToast('识别失败：' + msg, 'error');
+                }
             } finally {
                 btn.disabled = false;
                 setGenBtnLoading(btn, false);
@@ -8027,21 +8253,26 @@
                 } else if (m === 'stats') {
                     elements[m].classList.toggle('active', mode === m);
                     if (mode === 'stats') renderStats();
-                } else if (m === 'longvideo') {
-                    elements[m].classList.toggle('active', mode === m);
-                } else if (m === 'code' || m === 'tts' || m === 'embed' || m === 'market') {
+                } else if (m === 'code' || m === 'embed' || m === 'market') {
+                    // 这三种模式的面板用内联 style.display 控制，不使用 .active 类
                     elements[m].style.display = (mode === m) ? 'flex' : 'none';
                     if (mode === m) {
                         if (m === 'code') initCodeMode();
                         else if (m === 'embed') initEmbedMode();
                         else if (m === 'market') renderMarket();
-                        else if (m === 'translate') renderGenHistory('translate');
-                        else if (m === 'stt') { initSttMode(); renderGenHistory('stt'); }
                     }
                 } else {
+                    // vision / translate / stt / draw / video / task / character / longvideo 用 .active 类控制
                     elements[m].classList.toggle('active', mode === m);
+                    if (mode === m) {
+                        if (m === 'stt') { initSttMode(); renderGenHistory('stt'); }
+                        else if (m === 'translate') renderGenHistory('translate');
+                    }
                 }
             });
+
+            // 离开语音转文字模式时结束浏览器实时识别，避免后台继续占用麦克风
+            if (mode !== 'stt') stopSttLive();
 
             if (mode === 'chat') document.getElementById('messageInput')?.focus();
             else if (mode === 'vision') document.getElementById('visionPrompt')?.focus();
@@ -8198,7 +8429,7 @@
             text: { icon: '💬', desc: '通用对话 / 写作 / 推理，支持流式输出' },
             code: { icon: '💻', desc: '代码补全与生成' },
             image: { icon: '🎨', desc: '文生图（原生可用的绘图模型）' },
-            voice: { icon: '🎙️', desc: '语音识别（Whisper / Nova）' },
+            voice: { icon: '🎙️', desc: '语音识别（Whisper 系列）' },
             embedding: { icon: '🧬', desc: '文本向量化与语义检索' },
             vision: { icon: '👁️', desc: '图片理解与图像分类' },
             special: { icon: '🛠️', desc: '专用能力：翻译与内容安全审核' }
