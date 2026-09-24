@@ -3679,6 +3679,13 @@
             }
         }
 
+
+        /* 流式输出光标（逐字显示时的闪烁指示） */
+        .stream-cursor {
+            display: inline-block; margin-left: 2px; color: var(--accent-color, #ffd700);
+            animation: streamBlink 1s step-end infinite; font-weight: 700;
+        }
+        @keyframes streamBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
     </style>
     <link rel="stylesheet" href="/css/themes.css">
     <script src="/js/marked.min.js"></script>
@@ -3826,17 +3833,15 @@
                 <div class="chat-header">
                     <div>
                         <h1 id="chatTitle">新对话</h1>
-                        <p>和 HZYAI 对话，基于思知 AI 或 Agnes AI (Claw 模型)</p>
+                        <p>和 HZYAI 对话，基于思知 AI 或智谱 GLM 系列模型</p>
                     </div>
                     <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
                         <div class="model-selector">
                             <label for="chatModelSelect">🧠 模型：</label>
                             <select id="chatModelSelect">
                                 <option value="sizhi">思知 AI (默认)</option>
-                                <option value="agnes">Agnes 2.0 Flash（可能限流）</option>
                                 <option value="glm-4.7-flash">智谱 GLM-4.7-Flash</option>
                                 <option value="glm-4-flash-250414">智谱 GLM-4-Flash</option>
-                                <optgroup label="☁️ Cloudflare · 文本生成">
                                     <option value="@cf/meta/llama-3.3-70b-instruct-fp8-fast">Llama 3.3 70B (快速)</option>
                                     <option value="@cf/meta/llama-4-scout-17b-16e-instruct">Llama 4 Scout 17B</option>
                                     <option value="@cf/deepseek-ai/deepseek-r1-distill-qwen-32b">DeepSeek R1 Distill 32B</option>
@@ -3847,10 +3852,7 @@
                                     <option value="@cf/google/gemma-4-26b-a4b-it">Gemma 4 26B</option>
                                     <option value="@cf/google/gemma-7b-it-lora">Gemma 7B</option>
                                     <option value="@cf/mistral/mistral-7b-instruct-v0.2-lora">Mistral 7B</option>
-                                </optgroup>
-                                <optgroup label="☁️ Cloudflare · 代码生成">
                                     <option value="@cf/qwen/qwen2.5-coder-32b-instruct">Qwen2.5-Coder 32B</option>
-                                </optgroup>
                             </select>
                         </div>
                         <div class="chat-role-selector">
@@ -3876,7 +3878,7 @@
                 <div class="messages-area" id="messagesArea">
                     <div class="message assistant">
                         <div class="message-avatar">🤖</div>
-                        <div class="message-content">你好！我是 HZYAI，支持思知 AI、Agnes AI 和智谱 GLM 系列模型的智能对话、视觉理解、绘图、视频生成。选择模型后开始吧！</div>
+                        <div class="message-content">你好！我是 HZYAI，支持思知 AI、智谱 GLM 系列模型与 Cloudflare Workers AI 的智能对话、视觉理解、绘图、视频生成。选择模型后开始吧！</div>
                     </div>
                 </div>
                 <div class="input-area">
@@ -4038,11 +4040,9 @@
                             <option value="glm-4.6v-flash">智谱 GLM-4.6V-Flash</option>
                             <option value="glm-4.1v-thinking-flash">智谱 GLM-4.1V-Thinking-Flash</option>
                             <option value="glm-4v-flash">智谱 GLM-4V-Flash</option>
-                            <optgroup label="Cloudflare Workers AI">
                                 <option value="@cf/meta/llama-3.2-11b-vision-instruct">Llama 3.2 11B Vision</option>
                                 <option value="@cf/llava-hf/llava-1.5-7b-hf">LLaVA 1.5 7B</option>
                                 <option value="@cf/moondream/moondream3.1-9B-A2B">Moondream 3.1</option>
-                            </optgroup>
                         </select>
                         <input type="text" id="visionPrompt" class="prompt-input" placeholder="输入你想问的问题，例如：这张图片里有什么？" onkeydown="if(event.key==='Enter') analyzeVision()">
                         <button class="draw-generate-btn" id="visionAnalyzeBtn" onclick="analyzeVision()">🔍 分析</button>
@@ -4076,7 +4076,7 @@
             <div class="draw-mode" id="drawMode">
                 <div class="draw-header">
                     <h2>🎨 绘图模式</h2>
-                    <p>输入文字描述，AI 将为你生成图像 · 支持 Pollinations AI / Agnes Image / 智谱 Cogview</p>
+                    <p>输入文字描述，AI 将为你生成图像 · 支持 Pollinations AI / 智谱 CogView / Cloudflare Workers AI</p>
                 </div>
                 <div class="draw-input-area">
                     <div class="draw-input-row">
@@ -4092,10 +4092,8 @@
                             <option value="pollinations-flux">Pollinations AI (flux)</option>
                             <option value="pollinations-turbo">Pollinations AI (极速版)</option>
                             <option value="pollinations-flux-pro">Pollinations AI (专业版)</option>
-                            <optgroup label="Cloudflare Workers AI">
                                 <option value="@cf/black-forest-labs/flux-1-schnell">FLUX.1 Schnell</option>
                                 <option value="@cf/lykon/dreamshaper-8-lcm">DreamShaper 8 LCM</option>
-                            </optgroup>
                         </select>
                         <button class="draw-generate-btn" id="drawGenerateBtn" onclick="generateImage()">🎨 生成</button>
                     </div>
@@ -4104,7 +4102,7 @@
                         <span class="remove-hint">✕ 移除</span>
                     </div>
                     <div class="draw-input-row" style="gap:8px; font-size:12px; color:var(--text-muted);">
-                        <span>💡 支持文生图 · 图生图（多图输入） · Pollinations AI / Agnes Image / 智谱 Cogview · 输出 URL</span>
+                        <span>💡 支持文生图 · 图生图（多图输入） · Pollinations AI / 智谱 CogView / Cloudflare · 输出 URL</span>
                         <span style="color:var(--text-muted);">|</span>
                         <span>🔄 极速版: 512x512 (turbo) · 专业版: 1440x1440 (flux+增强)</span>
                     </div>
@@ -4113,7 +4111,7 @@
                     <div class="placeholder" id="drawPlaceholder">
                         <span class="icon">🖼️</span>
                         输入描述后点击「生成」<br>
-                        <span style="font-size:12px; color:var(--text-muted);">支持 Pollinations AI · Agnes Image · 智谱 Cogview</span>
+                        <span style="font-size:12px; color:var(--text-muted);">支持 Pollinations AI · 智谱 CogView · Cloudflare</span>
                     </div>
                     <div class="loading-spinner" id="drawLoading">
                         <div class="spinner"></div>
@@ -4129,7 +4127,7 @@
             <div class="draw-mode" id="videoMode">
                 <div class="draw-header">
                     <h2>🎬 视频生成模式</h2>
-                    <p>输入文字描述，AI 将为你生成视频 · 基于 Agnes Video V2.0 / 智谱 CogVideoX-Flash</p>
+                    <p>输入文字描述，AI 将为你生成视频 · 基于智谱 CogVideoX-Flash</p>
                 </div>
                 <div class="draw-input-area">
                     <div class="draw-input-row">
@@ -4154,7 +4152,7 @@
                         <span class="remove-hint">✕ 移除</span>
                     </div>
                     <div class="draw-input-row" style="gap:8px; font-size:12px; color:var(--text-muted);">
-                        <span>💡 基于 Agnes Video V2.0 / 智谱 CogVideoX-Flash · 异步生成 · 请耐心等待</span>
+                        <span>💡 基于智谱 CogVideoX-Flash · 异步生成 · 请耐心等待</span>
                     </div>
                 </div>
                 <div class="draw-result-area" id="videoResult">
@@ -4433,19 +4431,13 @@
         <div class="info-sidebar">
             <div class="info-section">
                 <h3>🤖 关于 HZYAI</h3>
-                <p>基于 思知 AI + Agnes AI + 智谱 GLM + <strong>Cloudflare Workers AI</strong> 的多模态对话助手，支持对话、视觉理解、绘图、视频生成、定时任务、虚拟角色，以及代码生成、语音合成、语义嵌入与全量 CF 模型市场。</p>
+                <p>基于 思知 AI + 智谱 GLM + <strong>Cloudflare Workers AI</strong> 的多模态对话助手，支持对话、视觉理解、绘图、视频生成、定时任务、虚拟角色，以及代码生成、语音合成、语义嵌入与全量 CF 模型市场。</p>
                 <p>对话记录<strong>本地存储</strong>，支持 Cloudflare D1 云端同步。</p>
-            </div>
-            <div class="info-section">
-                <h3>📺 产品介绍</h3>
-                <div class="video-container">
-                    <iframe frameborder="0" allowfullscreen mozallowfullscreen webkitallowfullscreen src="https://share.plvideo.cn/front/video/preview?vid=o8415a648d7e64810f9646f76baf4649_o"></iframe>
-                </div>
             </div>
             <div class="info-section">
                 <h3>✨ 功能列表</h3>
                 <ul class="feature-list">
-                    <li>💬 智能对话 (思知 AI / Agnes AI / 智谱 GLM / Cloudflare)</li>
+                    <li>💬 智能对话 (思知 AI / 智谱 GLM / Cloudflare)</li>
                     <li>👁️ 视觉理解</li>
                     <li>🎨 AI 绘图</li>
                     <li>🎬 AI 视频生成</li>
@@ -4504,10 +4496,6 @@
             avatar: '🤖'
         };
 
-        const AGNES_CONFIG = {
-            baseUrl: 'https://hzyai-worker.nflshcchat.cc.cd/agnes/v1',
-            chatModel: 'agnes-2.0-flash',
-        };
 
         const BIGMODEL_CONFIG = {
             baseUrl: 'https://hzyai-worker.nflshcchat.cc.cd/bigmodel/api/paas/v4',
@@ -4608,10 +4596,6 @@
         //  自动把该分类下「下拉里还没有」的模型补进一个分组，保证每个模式的
         //  模型选项卡都包含该模式可选的全部模型。
         // ============================================================
-        const CF_CATEGORY_LABEL = {
-            text: '文本生成', code: '代码生成', image: '图像生成',
-            voice: '语音 / 音频', embedding: '向量嵌入', vision: '视觉理解',
-        };
 
         function ensureModelsInSelect(selectId, category) {
             const sel = document.getElementById(selectId);
@@ -4619,20 +4603,14 @@
             if (!sel || !Array.isArray(list) || list.length === 0) return 0;
             const existing = new Set(Array.prototype.map.call(sel.options, o => o.value));
             const missing = list.filter(m => !existing.has(m.id));
-            // 移除上一次自动补的分组（模型清单可能已更新），再重新补
-            const old = sel.querySelector('optgroup[data-auto="1"]');
-            if (old) old.parentNode.removeChild(old);
             if (missing.length === 0) return 0;
-            const group = document.createElement('optgroup');
-            group.label = '☁️ Cloudflare · ' + (CF_CATEGORY_LABEL[category] || '') + '（其余 ' + missing.length + ' 个）';
-            group.setAttribute('data-auto', '1');
+            // 直接追加为普通选项（不添加任何分组标签，保持下拉里只有模型）
             missing.forEach(m => {
                 const o = document.createElement('option');
                 o.value = m.id;
                 o.textContent = m.name;
-                group.appendChild(o);
+                sel.appendChild(o);
             });
-            sel.appendChild(group);
             return missing.length;
         }
 
@@ -4875,7 +4853,7 @@
                 conversations = [{
                     id: Date.now().toString(),
                     title: '新对话',
-                    messages: [{ role: 'assistant', content: '你好！我是 HZYAI，支持思知 AI、Agnes AI 和智谱 GLM 系列模型的智能对话、视觉理解、绘图、视频生成。选择模型后开始吧！',
+                    messages: [{ role: 'assistant', content: '你好！我是 HZYAI，支持思知 AI、智谱 GLM 系列模型与 Cloudflare Workers AI 的智能对话、视觉理解、绘图、视频生成。选择模型后开始吧！',
                         timestamp: new Date().toISOString() }],
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),
@@ -5355,7 +5333,7 @@
             if (!container) return;
             if (!messages || messages.length === 0) {
                 container.innerHTML =
-                    '<div class="message assistant"><div class="message-avatar">🤖</div><div class="message-content">你好！我是 HZYAI，支持思知 AI、Agnes AI 和智谱 GLM 系列模型的智能对话、视觉理解、绘图、视频生成。选择模型后开始吧！</div></div>';
+                    '<div class="message assistant"><div class="message-avatar">🤖</div><div class="message-content">你好！我是 HZYAI，支持思知 AI、智谱 GLM 系列模型与 Cloudflare Workers AI 的智能对话、视觉理解、绘图、视频生成。选择模型后开始吧！</div></div>';
                 return;
             }
             container.innerHTML = messages.map(msg => {
@@ -5413,7 +5391,7 @@
             const newConv = {
                 id: Date.now().toString(),
                 title: '新对话',
-                messages: [{ role: 'assistant', content: '你好！我是 HZYAI，支持思知 AI、Agnes AI 和智谱 GLM 系列模型的智能对话、视觉理解、绘图、视频生成。选择模型后开始吧！',
+                messages: [{ role: 'assistant', content: '你好！我是 HZYAI，支持思知 AI、智谱 GLM 系列模型与 Cloudflare Workers AI 的智能对话、视觉理解、绘图、视频生成。选择模型后开始吧！',
                     timestamp: new Date().toISOString() }],
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
@@ -5558,6 +5536,77 @@
             return prompt;
         }
 
+        // ============================================================
+        //  ⚡ 流式输出（实时逐字显示）
+        //  支持的模型：
+        //    · Cloudflare Workers AI（@cf/*）→ /chat + stream:true，SSE 里取 data.response
+        //    · 智谱 GLM（glm-*）→ /bigmodel/.../chat/completions + stream:true，取 choices[0].delta.content
+        //  思知 AI 为 GET 接口、不支持流式，会返回 { ok:false } 让调用方回退到非流式。
+        // ============================================================
+        function canStreamModel(model) {
+            return !!(model && (model.startsWith('@cf/') || /^glm-/.test(model)));
+        }
+
+        async function streamChatModel(messages, model, roleId, onChunk) {
+            if (!canStreamModel(model)) return { ok: false, text: '', reason: 'unsupported' };
+            let systemPrompt = getRoleSystemPrompt(roleId);
+            let fullMessages = [...messages];
+            if (systemPrompt) fullMessages = [{ role: 'system', content: systemPrompt }, ...fullMessages];
+
+            const isCf = model.startsWith('@cf/');
+            const url = isCf ? `${CF_WORKER_API}/chat` : `${BIGMODEL_CONFIG.baseUrl}/chat/completions`;
+            const payload = isCf
+                ? { model: model, messages: fullMessages, stream: true, max_tokens: 16384 }
+                : { model: model, messages: fullMessages, stream: true, max_tokens: 8192 };
+
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok || !res.body) {
+                let detail = 'HTTP ' + res.status;
+                try { const j = await res.json(); detail = j.error || j.message || detail; } catch (e) { /* 忽略 */ }
+                throw new Error(detail);
+            }
+
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+            let buf = '';
+            let full = '';
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                buf += decoder.decode(value, { stream: true });
+                let nl;
+                while ((nl = buf.indexOf('\n')) !== -1) {
+                    const line = buf.slice(0, nl).trim();
+                    buf = buf.slice(nl + 1);
+                    if (!line || line.startsWith(':')) continue;
+                    if (!line.startsWith('data:')) continue;
+                    const dataStr = line.slice(5).trim();
+                    if (!dataStr || dataStr === '[DONE]') continue;
+                    let obj;
+                    try { obj = JSON.parse(dataStr); } catch (e) { continue; }
+                    let piece = '';
+                    if (isCf) {
+                        piece = obj.response || '';
+                        // 部分模型（OpenAI 风格）走 choices[].delta
+                        if (!piece && obj.choices && obj.choices[0] && obj.choices[0].delta) {
+                            piece = obj.choices[0].delta.content || '';
+                        }
+                    } else {
+                        piece = (obj.choices && obj.choices[0] && obj.choices[0].delta && obj.choices[0].delta.content) || '';
+                    }
+                    if (piece) {
+                        full += piece;
+                        if (onChunk) { try { onChunk(piece, full); } catch (e) { /* 渲染异常不影响流 */ } }
+                    }
+                }
+            }
+            return { ok: true, text: full };
+        }
+
         async function callChatModel(messages, model, roleId) {
             let systemPrompt = getRoleSystemPrompt(roleId);
             let fullMessages = [...messages];
@@ -5617,35 +5666,6 @@
                 }
             }
 
-            if (model === 'agnes') {
-                try {
-                    const url = `${AGNES_CONFIG.baseUrl}/chat/completions`;
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            model: AGNES_CONFIG.chatModel,
-                            messages: fullMessages.slice(-20).map(m => ({ role: m.role, content: m.content })),
-                            temperature: 0.7,
-                            max_tokens: 8192,
-                            chat_template_kwargs: {
-                                enable_thinking: true
-                            }
-                        })
-                    });
-
-                    const data = await response.json();
-                    if (data && data.choices && data.choices[0] && data.choices[0].message) {
-                        return data.choices[0].message.content;
-                    }
-                    return null;
-                } catch (error) {
-                    console.error('Agnes AI 调用失败:', error);
-                    return null;
-                }
-            }
 
             if (model === 'glm-4.7-flash' || model === 'glm-4-flash-250414') {
                 try {
@@ -5758,21 +5778,52 @@
 
             const conversation = conversations.find(c => c.id === currentConversationId);
             const container = document.getElementById('messagesArea');
-            const thinkingDiv = document.createElement('div');
-            thinkingDiv.className = 'message assistant';
-            thinkingDiv.innerHTML =
-                `<div class="message-avatar">🤖</div>
-                 <div class="hzyai-loader">
-                    <div class="loader-ring"></div>
-                    <span class="loader-letter">G</span><span class="loader-letter">e</span><span class="loader-letter">n</span><span class="loader-letter">e</span><span class="loader-letter">r</span><span class="loader-letter">a</span><span class="loader-letter">t</span><span class="loader-letter">i</span><span class="loader-letter">n</span><span class="loader-letter">g</span>
-                 </div>`;
-            container.appendChild(thinkingDiv);
-            scrollToBottom();
             isWaiting = true;
 
-            const reply = await callChatModel(conversation.messages, model, roleId);
+            let reply = null;
 
-            thinkingDiv.remove();
+            // ★ 优先走流式输出（逐字实时显示）；不支持的模型或失败时回退到非流式
+            if (canStreamModel(model)) {
+                const streamEl = document.createElement('div');
+                streamEl.className = 'message assistant';
+                streamEl.innerHTML =
+                    `<div class="message-avatar">🤖</div>
+                     <div class="message-content"><div class="hzyai-loader">
+                        <div class="loader-ring"></div>
+                        <span class="loader-letter">G</span><span class="loader-letter">e</span><span class="loader-letter">n</span><span class="loader-letter">e</span><span class="loader-letter">r</span><span class="loader-letter">a</span><span class="loader-letter">t</span><span class="loader-letter">i</span><span class="loader-letter">n</span><span class="loader-letter">g</span>
+                     </div></div>`;
+                container.appendChild(streamEl);
+                scrollToBottom();
+                const contentEl = streamEl.querySelector('.message-content');
+                try {
+                    const r = await streamChatModel(conversation.messages, model, roleId, function (piece, full) {
+                        contentEl.innerHTML = renderMarkdown(full) + '<span class="stream-cursor">▍</span>';
+                        scrollToBottom();
+                    });
+                    if (r.ok && r.text) reply = r.text;
+                    else if (r.ok) reply = null; // 空回复 → 交给下面的兜底逻辑
+                } catch (e) {
+                    console.warn('流式输出失败，回退非流式：', e);
+                }
+                streamEl.remove();
+            }
+
+            // 回退：非流式（含 Generating 等待动画）
+            if (!reply) {
+                const thinkingDiv = document.createElement('div');
+                thinkingDiv.className = 'message assistant';
+                thinkingDiv.innerHTML =
+                    `<div class="message-avatar">🤖</div>
+                     <div class="hzyai-loader">
+                        <div class="loader-ring"></div>
+                        <span class="loader-letter">G</span><span class="loader-letter">e</span><span class="loader-letter">n</span><span class="loader-letter">e</span><span class="loader-letter">r</span><span class="loader-letter">a</span><span class="loader-letter">t</span><span class="loader-letter">i</span><span class="loader-letter">n</span><span class="loader-letter">g</span>
+                     </div>`;
+                container.appendChild(thinkingDiv);
+                scrollToBottom();
+                reply = await callChatModel(conversation.messages, model, roleId);
+                thinkingDiv.remove();
+            }
+
             isWaiting = false;
 
             if (reply) {
@@ -6238,7 +6289,7 @@
                     } else {
                         throw new Error(data.error?.message || '生成失败');
                     }
-                    recordCall(model || 'agnes-image', 100);
+                    recordCall(model || 'image', 100);
                 }
 
                 currentMediaUrl = imageUrl;
@@ -6456,7 +6507,7 @@
                 downloadBtn.style.display = 'inline-block';
                 loading.classList.remove('active');
 
-                recordCall(model || 'agnes-video', 200);
+                recordCall(model || 'video', 200);
 
                 addToHistory('video', videoUrl, prompt);
                 addMessage('assistant', `🎬 生成的视频：${prompt}`, videoUrl, 'video');
@@ -7048,15 +7099,14 @@
             status: 'idle'
         };
 
-        async function callAgnesChat(messages) {
+        // 短片剧本/分镜生成：改用智谱 GLM（原 Agnes 已下线）
+        async function callFilmChat(messages) {
             try {
-                const response = await fetch(`${AGNES_CONFIG.baseUrl}/chat/completions`, {
+                const response = await fetch(`${BIGMODEL_CONFIG.baseUrl}/chat/completions`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        model: AGNES_CONFIG.chatModel,
+                        model: 'glm-4-flash-250414',
                         messages: messages,
                         temperature: 0.8,
                         max_tokens: 8192
@@ -7068,7 +7118,7 @@
                 }
                 return null;
             } catch (error) {
-                console.error('Agnes Chat 调用失败:', error);
+                console.error('智谱 Chat 调用失败:', error);
                 return null;
             }
         }
@@ -7085,7 +7135,7 @@
 
             try {
                 const prompt = `你是一位专业的短剧编剧。请根据以下主题，生成一个完整的短片剧本，包含场景描述、角色对话和情绪指引。剧本应包含 2-4 个场景，适合 30-60 秒的短片。\n\n主题：${idea}\n\n请输出格式：\n场景 X：...\n[角色名]：...\n...`;
-                const reply = await callAgnesChat([{ role: 'user', content: prompt }]);
+                const reply = await callFilmChat([{ role: 'user', content: prompt }]);
 
                 if (reply) {
                     filmProject.script = reply;
@@ -7113,7 +7163,7 @@
 
             try {
                 const prompt = `你是一位专业的视频分镜师。请根据以下剧本，将其拆解为 2-4 个镜头，并为每个镜头生成一个详细的图片生成提示词（用于 AI 绘图，描述画面内容、风格、光照和构图）。\n\n剧本：\n${filmProject.script}\n\n请输出 JSON 数组格式，每个对象包含 "scene_name"（场景名）、"scene_description"（场景描述）、"image_prompt"（英文或中文图片提示词）。\n输出示例：\n[\n  {"scene_name": "开场", "scene_description": "太空背景，猫出现", "image_prompt": "A cat floating in space, wearing a space suit, stars in background, cinematic style, dramatic lighting"}, ...\n]`;
-                const reply = await callAgnesChat([{ role: 'user', content: prompt }]);
+                const reply = await callFilmChat([{ role: 'user', content: prompt }]);
 
                 if (reply) {
                     const jsonMatch = reply.match(/\[[\s\S]*\]/);
@@ -8352,12 +8402,12 @@
 
 🧠 九、HZYAI
 访问地址：https://user-henry.github.io/nflshcchat/hzyai
-简介：HZYAI 是基于思知 AI、Agnes AI 和智谱 GLM 构建的多模态智能对话助手，支持对话、绘图、视频生成、视觉理解、定时任务和虚拟角色定制。
+简介：HZYAI 是基于思知 AI、智谱 GLM 与 Cloudflare Workers AI 构建的多模态智能对话助手，支持对话、绘图、视频生成、视觉理解、定时任务和虚拟角色定制。
 
 9.1 核心功能
-- 💬 智能对话：思知 AI / Agnes 2.0 Flash / 智谱 GLM-4.7-Flash / GLM-4-Flash-250414
-- 🎨 AI 绘图：Agnes Image 2.1 Flash / 智谱 Cogview-3-Flash（文生图/图生图，多图输入）
-- 🎬 AI 视频生成：Agnes Video V2.0 / 智谱 CogVideoX-Flash（文生视频/图生视频，异步）
+- 💬 智能对话：思知 AI / 智谱 GLM-4.7-Flash / GLM-4-Flash-250414 / Cloudflare 模型
+- 🎨 AI 绘图：智谱 CogView-3-Flash / Pollinations AI / Cloudflare（文生图/图生图，多图输入）
+- 🎬 AI 视频生成：智谱 CogVideoX-Flash（文生视频/图生视频，异步）
 - 👁️ 视觉理解：智谱 GLM-4.6V-Flash / GLM-4.1V-Thinking-Flash / GLM-4V-Flash（图片/视频/文件理解）
 - ⏰ 定时任务：新闻/天气/提醒 自动推送
 - 🎭 虚拟角色：自定义人设、语气、记忆系统
@@ -8370,7 +8420,6 @@
 
 9.3 模型选择指南
 - 思知 AI：完全免费，无限制，适合日常对话
-- Agnes 2.0 Flash：多模态模型，支持工具调用、编码、图像理解
 - 智谱 GLM-4.7-Flash：30B 级 SOTA 模型，强化编码能力与长程规划
 - 智谱 GLM-4-Flash-250414：免费文本模型，128K 上下文
 
