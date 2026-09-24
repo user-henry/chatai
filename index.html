@@ -3739,6 +3739,32 @@
             border: 1px solid var(--border-color);
         }
         .market-empty { grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted); }
+
+        /* ===== 语音转文字（STT） ===== */
+        .stt-mode { display: none; flex: 1; flex-direction: column; padding: 20px; background: var(--bg-tertiary); overflow-y: auto; }
+        .stt-mode.active { display: flex; }
+        .stt-panel { background: var(--bg-secondary); border-radius: var(--hzy-radius, 12px); padding: 18px; border: 1px solid var(--border-color); }
+        .stt-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+        .stt-row label { font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
+        .stt-row select { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 14px; cursor: pointer; }
+        .stt-upload-btn {
+            display: inline-flex; align-items: center; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+            background: var(--bg-tertiary); border: 1px solid var(--border-color); font-size: 14px;
+            color: var(--text-primary); transition: border-color .2s ease, transform .16s ease;
+        }
+        .stt-upload-btn:hover { border-color: var(--accent-color); transform: translateY(-1px); }
+        .stt-preview { background: var(--bg-tertiary); border-radius: 10px; padding: 14px; border: 1px dashed var(--border-color); }
+        .stt-preview-info { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+        .stt-output {
+            width: 100%; min-height: 190px; padding: 12px 14px; border-radius: 10px;
+            border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);
+            font-family: inherit; font-size: 14px; line-height: 1.8; resize: vertical;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+        .stt-output:focus { outline: none; border-color: var(--accent-color); box-shadow: var(--hzy-glow, 0 0 0 3px rgba(255,200,87,.12)); }
+        .stt-actions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+        #sttRecordBtn.recording { background: var(--danger, #e74c3c) !important; color: #fff !important; animation: sttPulse 1.2s ease-in-out infinite; }
+        @keyframes sttPulse { 0%, 100% { opacity: 1; } 50% { opacity: .6; } }
     </style>
     <link rel="stylesheet" href="/css/themes.css">
     <script src="/js/marked.min.js"></script>
@@ -3845,6 +3871,7 @@
                 <button class="mode-tab active" data-mode="chat" onclick="switchMode('chat')">💬 对话</button>
                 <button class="mode-tab" data-mode="vision" onclick="switchMode('vision')">👁️ 视觉</button>
                 <button class="mode-tab" data-mode="translate" onclick="switchMode('translate')">🌐 翻译</button>
+                <button class="mode-tab" data-mode="stt" onclick="switchMode('stt')">🎙️ 语音转文字</button>
                 <button class="mode-tab" data-mode="draw" onclick="switchMode('draw')">🎨 绘图</button>
                 <button class="mode-tab" data-mode="video" onclick="switchMode('video')">🎬 视频</button>
                 <button class="mode-tab" data-mode="task" onclick="switchMode('task')">⏰ 定时任务</button>
@@ -3990,6 +4017,62 @@
                 <div class="gen-history-panel">
                     <div class="gen-history-title">💻 代码生成历史</div>
                     <div id="codeHistory" class="gen-history-list"></div>
+                </div>
+            </div>
+
+            <!-- ====== 语音转文字（STT）======
+                 注意：不使用内联 style="display:none"，由 switchMode 的 classList.active 配合 CSS 控制，
+                 否则内联样式优先级更高会导致面板无法显示（同翻译模式曾出现过的问题）。 -->
+            <div class="stt-mode" id="sttMode">
+                <div class="chat-header">
+                    <div>
+                        <h1>🎙️ 语音转文字</h1>
+                        <p>录音或上传音频文件，由 Cloudflare Whisper / Nova 识别为文字</p>
+                    </div>
+                    <div class="model-selector">
+                        <label for="sttModelSelect">🧠 模型：</label>
+                        <select id="sttModelSelect"></select>
+                    </div>
+                </div>
+                <div class="stt-panel">
+                    <div class="stt-row">
+                        <label>识别语言
+                            <select id="sttLang">
+                                <option value="">自动检测</option>
+                                <option value="zh">中文</option>
+                                <option value="en">英语</option>
+                                <option value="ja">日语</option>
+                                <option value="ko">韩语</option>
+                                <option value="fr">法语</option>
+                                <option value="de">德语</option>
+                                <option value="es">西班牙语</option>
+                                <option value="ru">俄语</option>
+                            </select>
+                        </label>
+                        <label class="stt-upload-btn">📂 上传音频
+                            <input type="file" id="sttFileInput" accept="audio/*" style="display:none;" onchange="handleSttFile(this)">
+                        </label>
+                        <button class="draw-generate-btn" id="sttRecordBtn" onclick="toggleSttRecording()">🎤 开始录音</button>
+                        <button class="draw-generate-btn" id="sttRunBtn" onclick="runStt()" style="background:var(--accent-color);color:var(--bg-primary);">▶️ 开始识别</button>
+                        <span id="sttStatus" class="sync-status"></span>
+                    </div>
+
+                    <div class="stt-preview" id="sttPreviewBox">
+                        <div class="stt-preview-info" id="sttFileInfo">尚未选择音频（可直接录音，或上传 wav / mp3 / m4a / webm 等格式）</div>
+                        <audio id="sttAudioPlayer" controls style="display:none;width:100%;margin-top:10px;"></audio>
+                    </div>
+
+                    <label style="display:block;margin:16px 0 6px;font-size:13px;color:var(--text-secondary);">识别结果：</label>
+                    <textarea id="sttOutput" class="stt-output" placeholder="识别出的文字会显示在这里…"></textarea>
+                    <div class="stt-actions">
+                        <button class="draw-generate-btn" onclick="copySttText()" style="background:var(--bg-tertiary);color:var(--text-primary);">📋 复制文字</button>
+                        <button class="draw-generate-btn" onclick="sttTextToChat()" style="background:var(--bg-tertiary);color:var(--text-primary);">💬 发送到对话</button>
+                        <button class="draw-generate-btn" onclick="sttTextToTranslate()" style="background:var(--bg-tertiary);color:var(--text-primary);">🌐 送去翻译</button>
+                    </div>
+                    <div class="gen-history-panel">
+                        <div class="gen-history-title">🎙️ 识别历史</div>
+                        <div id="sttHistory" class="gen-history-list"></div>
+                    </div>
                 </div>
             </div>
 
@@ -7705,6 +7788,151 @@
         //  模式切换
         // ============================================================
         // ============================================================
+        // ============================================================
+        //  🎙️ 语音转文字（STT）
+        //  支持浏览器录音（MediaRecorder）或上传音频文件，交给 Cloudflare Whisper / Nova 识别为文本。
+        // ============================================================
+        let sttRecorder = null;
+        let sttChunks = [];
+        let sttAudioData = null;   // data URL（data:audio/...;base64,...）
+        let sttRecording = false;
+
+        function initSttMode() {
+            const sel = document.getElementById('sttModelSelect');
+            if (sel && !sel.dataset.filled && CF_MODELS.voice && CF_MODELS.voice.length) {
+                fillCfSelect(sel, CF_MODELS.voice, CF_MODELS.voice[0].id);
+                sel.dataset.filled = '1';
+            }
+        }
+
+        function handleSttFile(input) {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            if (!/^audio\//.test(file.type) && !/\.(wav|mp3|m4a|webm|ogg|flac|aac|opus)$/i.test(file.name)) {
+                showToast('请选择音频文件（wav / mp3 / m4a / webm 等）', 'warning');
+                return;
+            }
+            if (file.size > 20 * 1024 * 1024) { showToast('音频过大（20MB 以内）', 'warning'); return; }
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                sttAudioData = e.target.result;
+                const info = document.getElementById('sttFileInfo');
+                info.textContent = '已选择：' + file.name + '（' + Math.round(file.size / 1024) + ' KB）';
+                const player = document.getElementById('sttAudioPlayer');
+                player.src = sttAudioData;
+                player.style.display = 'block';
+                showToast('音频已就绪，点击「开始识别」', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function toggleSttRecording() {
+            const btn = document.getElementById('sttRecordBtn');
+            const status = document.getElementById('sttStatus');
+            if (sttRecording) {
+                try { if (sttRecorder && sttRecorder.state !== 'inactive') sttRecorder.stop(); } catch (e) { /* 忽略 */ }
+                return;
+            }
+            if (!navigator.mediaDevices || !window.MediaRecorder) {
+                showToast('当前浏览器不支持录音，请改用「上传音频」', 'error');
+                return;
+            }
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                sttChunks = [];
+                sttRecorder = new MediaRecorder(stream);
+                sttRecorder.ondataavailable = function (e) { if (e.data && e.data.size > 0) sttChunks.push(e.data); };
+                sttRecorder.onstop = function () {
+                    stream.getTracks().forEach(function (t) { t.stop(); });
+                    sttRecording = false;
+                    btn.textContent = '🎤 开始录音';
+                    btn.classList.remove('recording');
+                    status.textContent = '';
+                    const type = (sttChunks[0] && sttChunks[0].type) || 'audio/webm';
+                    const blob = new Blob(sttChunks, { type: type });
+                    if (blob.size === 0) { showToast('没有录到音频，请重试', 'warning'); return; }
+                    const reader = new FileReader();
+                    reader.onload = function (ev) {
+                        sttAudioData = ev.target.result;
+                        document.getElementById('sttFileInfo').textContent = '录音完成（' + Math.round(blob.size / 1024) + ' KB）';
+                        const player = document.getElementById('sttAudioPlayer');
+                        player.src = sttAudioData;
+                        player.style.display = 'block';
+                        showToast('录音完成，点击「开始识别」', 'success');
+                    };
+                    reader.readAsDataURL(blob);
+                };
+                sttRecorder.start();
+                sttRecording = true;
+                btn.textContent = '⏹ 停止录音';
+                btn.classList.add('recording');
+                status.textContent = '🔴 正在录音…点击「停止录音」结束';
+            } catch (e) {
+                showToast('无法访问麦克风：' + (e.message || e) + '（请允许麦克风权限，或改用上传音频）', 'error');
+            }
+        }
+
+        async function runStt() {
+            if (!sttAudioData) { showToast('请先录音或上传音频文件', 'warning'); return; }
+            const model = document.getElementById('sttModelSelect').value;
+            const lang = document.getElementById('sttLang').value;
+            const status = document.getElementById('sttStatus');
+            const out = document.getElementById('sttOutput');
+            const btn = document.getElementById('sttRunBtn');
+            btn.disabled = true;
+            setGenBtnLoading(btn, true, 'Recognizing');
+            status.textContent = '⏳ 识别中…';
+            out.value = '';
+            try {
+                const payload = { model: model, audio: sttAudioData };
+                if (lang) { payload.language = lang; payload.lang = lang; }
+                const r = await fetch(CF_WORKER_API + '/stt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await r.json().catch(function () { return {}; });
+                if (!r.ok || data.error) throw new Error(data.error || ('识别失败 (HTTP ' + r.status + ')'));
+                const text = data.text || '';
+                out.value = text || '（未识别到文本，可能是音频过短或格式不受支持）';
+                status.textContent = '✅ 识别完成' + (text ? '' : '（无文本）');
+                if (text) {
+                    addGenRecord('stt', { title: text.slice(0, 40), content: text });
+                    renderGenHistory('stt');
+                }
+            } catch (e) {
+                status.textContent = '❌ ' + (e.message || '识别失败');
+                showToast('识别失败：' + (e.message || e), 'error');
+            } finally {
+                btn.disabled = false;
+                setGenBtnLoading(btn, false);
+            }
+        }
+
+        async function copySttText() {
+            const out = document.getElementById('sttOutput');
+            if (!out.value.trim()) { showToast('还没有识别结果', 'warning'); return; }
+            try { await navigator.clipboard.writeText(out.value); showToast('文字已复制', 'success'); }
+            catch (e) { out.select(); document.execCommand('copy'); showToast('文字已复制', 'success'); }
+        }
+
+        function sttTextToChat() {
+            const out = document.getElementById('sttOutput');
+            if (!out.value.trim()) { showToast('还没有识别结果', 'warning'); return; }
+            switchMode('chat');
+            var input = document.getElementById('messageInput');
+            if (input) { input.value = out.value; input.focus(); }
+            showToast('已把识别结果填入对话输入框', 'success');
+        }
+
+        function sttTextToTranslate() {
+            const out = document.getElementById('sttOutput');
+            if (!out.value.trim()) { showToast('还没有识别结果', 'warning'); return; }
+            switchMode('translate');
+            var input = document.getElementById('translateInput');
+            if (input) { input.value = out.value; }
+            showToast('已把识别结果送到翻译模式', 'success');
+        }
         //  🌐 智能翻译
         // ============================================================
         async function doTranslate() {
@@ -7770,11 +7998,12 @@
 
         function switchMode(mode) {
             currentMode = mode;
-            const modes = ['chat', 'vision', 'translate', 'draw', 'video', 'task', 'character', 'film', 'stats', 'longvideo', 'code', 'embed', 'market'];
+            const modes = ['chat', 'vision', 'translate', 'stt', 'draw', 'video', 'task', 'character', 'film', 'stats', 'longvideo', 'code', 'embed', 'market'];
             const elements = {
                 chat: document.getElementById('chatMode'),
                 vision: document.getElementById('visionMode'),
                 translate: document.getElementById('translateMode'),
+                stt: document.getElementById('sttMode'),
                 draw: document.getElementById('drawMode'),
                 video: document.getElementById('videoMode'),
                 task: document.getElementById('taskMode'),
@@ -7806,6 +8035,8 @@
                         if (m === 'code') initCodeMode();
                         else if (m === 'embed') initEmbedMode();
                         else if (m === 'market') renderMarket();
+                        else if (m === 'translate') renderGenHistory('translate');
+                        else if (m === 'stt') { initSttMode(); renderGenHistory('stt'); }
                     }
                 } else {
                     elements[m].classList.toggle('active', mode === m);
