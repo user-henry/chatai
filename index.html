@@ -3952,9 +3952,6 @@
                     <label>输入要合成的文本：</label>
                     <textarea id="ttsText" rows="4" placeholder="输入要转换为语音的文字..." style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);"></textarea>
                     <div class="tts-row">
-                        <label>模型：
-                            <select id="ttsModelSelect"></select>
-                        </label>
                         <label>语言：
                             <select id="ttsLang">
                                 <option value="zh-CN">中文</option>
@@ -4531,11 +4528,6 @@
                 { id: '@cf/openai/gpt-oss-120b', name: 'GPT-OSS 120B' },
                 { id: '@cf/aisingapore/gemma-sea-lion-v4-27b-it', name: 'Sea Lion v4 27B' },
                 { id: '@cf/ibm-granite/granite-4.0-h-micro', name: 'Granite 4.0 H Micro' },
-                { id: '@cf/ai4bharat/indictrans2-en-indic-1B', name: 'IndicTrans2 EN-Indic' },
-                { id: '@cf/meta/llama-guard-3-8b', name: 'Llama Guard 3 8B' },
-                { id: '@cf/pipecat-ai/smart-turn-v2', name: 'Smart Turn V2' },
-                { id: '@cf/huggingface/distilbert-sst-2-int8', name: 'DistilBERT SST-2 (情感)' },
-                { id: '@cf/meta/m2m100-1.2b', name: 'M2M100 1.2B (翻译)' }
             ],
             // 代码生成类（编程 / 补全）
             code: [
@@ -4545,24 +4537,14 @@
             // 图像生成
             image: [
                 { id: '@cf/black-forest-labs/flux-1-schnell', name: 'FLUX.1 Schnell' },
-                { id: '@cf/stabilityai/stable-diffusion-xl-base-1.0', name: 'SDXL Base 1.0（自动兜底）' },
-                { id: '@cf/bytedance/stable-diffusion-xl-lightning', name: 'SDXL Lightning（自动兜底）' },
-                { id: '@cf/lykon/dreamshaper-8-lcm', name: 'DreamShaper LCM（自动兜底）' },
                 { id: '@cf/leonardo/lucid-origin', name: 'Leonardo Lucid Origin' },
-                { id: '@cf/leonardo/phoenix-1.0', name: 'Leonardo Phoenix 1.0（自动兜底）' },
-                { id: '@cf/runwayml/stable-diffusion-v1-5-inpainting', name: 'SD v1.5 Inpainting（自动兜底）' }
             ],
             // 语音 / 音频合成（TTS）/ 语音识别（STT）/ 翻译
             voice: [
-                { id: '@cf/myshell-ai/melotts', name: 'MeLo-TTS (语音合成)' },
                 { id: '@cf/openai/whisper', name: 'Whisper (语音识别)' },
                 { id: '@cf/openai/whisper-large-v3-turbo', name: 'Whisper Large v3 Turbo' },
                 { id: '@cf/openai/whisper-tiny-en', name: 'Whisper Tiny (英文)' },
-                { id: '@cf/deepgram/aura-2-en', name: 'Aura 2 (英文 TTS)' },
-                { id: '@cf/deepgram/aura-2-es', name: 'Aura 2 (西班牙文 TTS)' },
-                { id: '@cf/deepgram/aura-1', name: 'Aura 1 (TTS)' },
                 { id: '@cf/deepgram/nova-3', name: 'Nova 3 (语音识别)' },
-                { id: '@cf/meta/m2m100-1.2b', name: 'M2M100 1.2B (翻译)' }
             ],
             // 语义嵌入 / 向量 / 重排序
             embedding: [
@@ -4622,7 +4604,6 @@
                 chat: ensureModelsInSelect('chatModelSelect', 'text'),
                 image: ensureModelsInSelect('drawModelSelect', 'image'),
                 vision: ensureModelsInSelect('visionModelSelect', 'vision'),
-                voice: ensureModelsInSelect('ttsModelSelect', 'voice'),
             };
         }
 
@@ -7706,37 +7687,10 @@
             const text = document.getElementById('ttsText').value.trim();
             if (!text) { showToast('请输入要合成的文本', 'warning'); return; }
             const lang = document.getElementById('ttsLang').value;
-            const ttsModelSel = document.getElementById('ttsModelSelect');
-            const ttsModel = (ttsModelSel && ttsModelSel.value) || '@cf/myshell-ai/melotts';
             const status = document.getElementById('ttsStatus');
-            status.textContent = '⏳ 正在合成语音...';
-            try {
-                const response = await fetch(`${CF_WORKER_API}/tts`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ model: ttsModel, prompt: text, language: lang })
-                });
-                const data = await response.json().catch(() => ({}));
-                // Cloudflare 语音合成不可用时（如 melotts 侧 3043），回退浏览器朗读，避免红框报错
-                if (!response.ok || !data.audio || typeof data.audio !== 'string' || data.audio.length < 100) {
-                    status.textContent = '⚠️ 云端合成暂不可用，已切换为浏览器朗读';
-                    ttsSpeakFallback(text);
-                    return;
-                }
-                recordCall(data.model || '@cf/myshell-ai/melotts', 100);
-                if (ttsAudioUrl) URL.revokeObjectURL(ttsAudioUrl);
-                ttsAudioUrl = 'data:audio/mpeg;base64,' + data.audio;
-                const audio = document.getElementById('ttsAudio');
-                audio.src = ttsAudioUrl;
-                document.getElementById('ttsPlayer').style.display = 'block';
-                audio.play();
-                status.textContent = data.fallbackUsed ? '✅ 合成完成（已自动降级模型）' : '✅ 合成完成';
-                // 保存到本地 + 云端 D1
-                addGenRecord('audio', { title: text.slice(0, 40), prompt: text, url: ttsAudioUrl });
-            } catch (e) {
-                status.textContent = '⚠️ 合成失败，已切换为浏览器朗读';
-                ttsSpeakFallback(text);
-            }
+            // Cloudflare TTS 模型已下线，直接使用浏览器朗读（中文效果好、免费）
+            status.textContent = '🔊 正在使用浏览器朗读...';
+            ttsSpeakFallback(text);
         }
 
         // 浏览器朗读兜底（系统语音，无需云端模型，中文支持良好）
