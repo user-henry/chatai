@@ -4605,21 +4605,24 @@
         <div class="info-sidebar">
             <div class="info-section">
                 <h3>🤖 关于 HZYAI</h3>
-                <p>基于 思知 AI + 智谱 GLM + <strong>Cloudflare Workers AI</strong> 的多模态对话助手，支持对话、视觉理解、绘图、视频生成、定时任务、虚拟角色，以及代码生成、语音合成、语义嵌入与全量 CF 模型市场。</p>
+                <p>基于 思知 AI + 智谱 GLM + <strong>Cloudflare Workers AI</strong> 的多模态助手，支持对话、语音转文字、翻译、视觉理解、绘图、视频与 AI 短片、定时任务、虚拟角色、代码生成、语义嵌入与全量 CF 模型市场。</p>
                 <p>对话记录<strong>本地存储</strong>，支持 Cloudflare D1 云端同步。</p>
             </div>
             <div class="info-section">
                 <h3>✨ 功能列表</h3>
                 <ul class="feature-list">
                     <li>💬 智能对话 · 实时流式输出</li>
+                    <li>🎙️ 语音转文字 · Whisper / 浏览器实时识别</li>
+                    <li>🌐 智能翻译 · GLM / m2m100 / IndicTrans2</li>
+                    <li>🛡️ 内容审核 · Llama Guard 3（每条消息可点）</li>
                     <li>👁️ 视觉理解 · 图片描述与问答</li>
-                    <li>🎨 AI 绘图 · CogView / FLUX / Pollinations</li>
-                    <li>🎬 AI 视频 · 智谱 CogVideoX</li>
+                    <li>🎨 AI 绘图 · FLUX / Lucid Origin</li>
+                    <li>🎬 视频生成 · 智谱 CogVideoX</li>
+                    <li>🎞️ AI 短片工作流 · 剧本到成片</li>
                     <li>💻 代码生成 · Qwen2.5-Coder / Qwen3</li>
                     <li>🧬 语义嵌入 / 向量检索</li>
-                    <li>🧠 Cloudflare 模型市场</li>
-                    <li>⏰ 定时任务</li>
-                    <li>🎭 虚拟角色定制</li>
+                    <li>🧠 Cloudflare 模型市场 · 7 大类模型</li>
+                    <li>⏰ 定时任务 · 🎭 虚拟角色定制</li>
                 </ul>
             </div>
             <div class="footer-note">HZYAI · 让创作更自由</div>
@@ -9017,6 +9020,9 @@
 
 9.1 核心功能
 - 💬 智能对话：思知 AI / 智谱 GLM-4.7-Flash / GLM-4-Flash-250414 / Cloudflare 模型
+- 🎙️ 语音转文字：录音或上传音频，由 Cloudflare Whisper 识别（Turbo / 多语言 / 英文快速三档可选），另支持浏览器实时识别（边说边出字，不消耗额度）
+- 🌐 智能翻译：智谱 GLM（质量优先）/ Cloudflare m2m100（快速免费）/ IndicTrans2（英→印度语系）
+- 🛡️ 内容审核：每条消息可点「🛡️」调用 Llama Guard 3 判定风险类别
 - 🎨 AI 绘图：智谱 CogView-3-Flash / Pollinations AI / Cloudflare（文生图/图生图，多图输入）
 - 🎬 AI 视频生成：智谱 CogVideoX-Flash（文生视频/图生视频，异步）
 - 👁️ 视觉理解：智谱 GLM-4.6V-Flash / GLM-4.1V-Thinking-Flash / GLM-4V-Flash（图片/视频/文件理解）
@@ -9026,7 +9032,8 @@
 9.2 技术架构
 - 前端：纯原生 HTML/CSS/JavaScript，无第三方框架
 - 数据存储：浏览器 localStorage + Cloudflare D1 云端同步
-- 语音输入：Web Speech API（Chrome/Edge 支持）
+- 语音输入 / 实时识别：Web Speech API（Chrome/Edge 支持）
+- 语音转文字：MediaRecorder 录音或上传音频 → 前端统一转 16kHz 单声道 WAV → Cloudflare Whisper
 - 角色记忆系统：对话结束后自动总结并写入角色记忆
 
 9.3 模型选择指南
