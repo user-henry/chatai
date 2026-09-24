@@ -3686,6 +3686,40 @@
             animation: streamBlink 1s step-end infinite; font-weight: 700;
         }
         @keyframes streamBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* ===== 智能翻译模式 ===== */
+        .translate-mode { display: none; flex: 1; flex-direction: column; padding: 20px; background: var(--bg-tertiary); overflow-y: auto; }
+        .translate-mode.active { display: flex; }
+        .translate-panel { background: var(--bg-secondary); border-radius: var(--hzy-radius, 12px); padding: 18px; border: 1px solid var(--border-color); }
+        .translate-langs { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+        .translate-langs label { font-size: 13px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 6px; }
+        .translate-langs select { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 14px; cursor: pointer; }
+        .translate-swap {
+            width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 17px;
+            border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--accent-color);
+            transition: transform .2s ease, border-color .2s ease;
+        }
+        .translate-swap:hover { transform: rotate(180deg); border-color: var(--accent-color); }
+        .translate-boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .translate-boxes textarea {
+            min-height: 230px; padding: 12px 14px; border-radius: 10px;
+            border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);
+            font-family: inherit; font-size: 14px; line-height: 1.75; resize: vertical;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+        .translate-boxes textarea:focus { outline: none; border-color: var(--accent-color); box-shadow: var(--hzy-glow, 0 0 0 3px rgba(255,200,87,.12)); }
+        .translate-actions { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+        @media (max-width: 768px) { .translate-boxes { grid-template-columns: 1fr; } }
+
+        /* 消息上的内容审核按钮 */
+        .mod-btn {
+            background: none; border: none; cursor: pointer; font-size: 14px;
+            padding: 2px 4px; vertical-align: middle; opacity: .45;
+            transition: opacity .18s ease, transform .18s ease;
+        }
+        .mod-btn:hover { opacity: 1; transform: scale(1.18); }
+        .mod-btn:disabled { cursor: progress; opacity: .8; }
+        .message-content:hover .mod-btn { opacity: .95; }
     </style>
     <link rel="stylesheet" href="/css/themes.css">
     <script src="/js/marked.min.js"></script>
@@ -3791,6 +3825,7 @@
             <div class="mode-tabs" id="modeTabs">
                 <button class="mode-tab active" data-mode="chat" onclick="switchMode('chat')">💬 对话</button>
                 <button class="mode-tab" data-mode="vision" onclick="switchMode('vision')">👁️ 视觉</button>
+                <button class="mode-tab" data-mode="translate" onclick="switchMode('translate')">🌐 翻译</button>
                 <button class="mode-tab" data-mode="draw" onclick="switchMode('draw')">🎨 绘图</button>
                 <button class="mode-tab" data-mode="video" onclick="switchMode('video')">🎬 视频</button>
                 <button class="mode-tab" data-mode="task" onclick="switchMode('task')">⏰ 定时任务</button>
@@ -3799,7 +3834,6 @@
                 <button class="mode-tab" data-mode="longvideo" onclick="switchMode('longvideo')">🎬 长视频</button>
                 <button class="mode-tab" data-mode="stats" onclick="switchMode('stats')">📊 统计</button>
                 <button class="mode-tab" data-mode="code" onclick="switchMode('code')">💻 代码生成</button>
-                <button class="mode-tab" data-mode="tts" onclick="switchMode('tts')">🎤 语音合成</button>
                 <button class="mode-tab" data-mode="embed" onclick="switchMode('embed')">🧬 语义嵌入</button>
                 <button class="mode-tab" data-mode="market" onclick="switchMode('market')">🧠 模型市场</button>
             </div>
@@ -3940,39 +3974,75 @@
                 </div>
             </div>
 
-            <!-- ====== 语音合成模式 ====== -->
-            <div class="tts-mode" id="ttsMode" style="display:none;">
+            <!-- ====== 翻译模式 ====== -->
+            <div class="translate-mode" id="translateMode" style="display:none;">
                 <div class="chat-header">
                     <div>
-                        <h1>🎤 语音合成</h1>
-                        <p>将文字转换为语音（Cloudflare Workers AI TTS）</p>
+                        <h1>🌐 智能翻译</h1>
+                        <p>多语言互译 · Cloudflare m2m100（快速）/ 智谱 GLM（质量优先）</p>
+                    </div>
+                    <div class="model-selector">
+                        <label for="translateEngine">⚙️ 引擎：</label>
+                        <select id="translateEngine">
+                            <option value="cf">Cloudflare m2m100（快速）</option>
+                            <option value="glm">智谱 GLM（质量优先）</option>
+                        </select>
                     </div>
                 </div>
-                <div class="tts-panel">
-                    <label>输入要合成的文本：</label>
-                    <textarea id="ttsText" rows="4" placeholder="输入要转换为语音的文字..." style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);"></textarea>
-                    <div class="tts-row">
-                        <label>语言：
-                            <select id="ttsLang">
-                                <option value="zh-CN">中文</option>
-                                <option value="en-US">English</option>
-                                <option value="ja-JP">日本語</option>
-                                <option value="ko-KR">한국어</option>
-                                <option value="fr-FR">Français</option>
-                                <option value="de-DE">Deutsch</option>
-                                <option value="es-ES">Español</option>
+                <div class="translate-panel">
+                    <div class="translate-langs">
+                        <label>源语言
+                            <select id="translateSource">
+                                <option value="auto">自动检测</option>
+                        <option value="zh">中文</option>
+                        <option value="en">英语</option>
+                        <option value="ja">日语</option>
+                        <option value="ko">韩语</option>
+                        <option value="fr">法语</option>
+                        <option value="de">德语</option>
+                        <option value="es">西班牙语</option>
+                        <option value="ru">俄语</option>
+                        <option value="pt">葡萄牙语</option>
+                        <option value="it">意大利语</option>
+                        <option value="ar">阿拉伯语</option>
+                        <option value="hi">印地语</option>
+                        <option value="th">泰语</option>
+                        <option value="vi">越南语</option>
                             </select>
                         </label>
-                        <button class="draw-generate-btn" onclick="startTTS()">🔊 合成语音</button>
-                        <button class="draw-generate-btn" onclick="stopTTS()" style="background:var(--danger);">⏹ 停止</button>
+                        <button class="translate-swap" onclick="swapTranslateLangs()" title="交换语言">⇄</button>
+                        <label>目标语言
+                            <select id="translateTarget">
+                        <option value="zh">中文</option>
+                        <option value="en">英语</option>
+                        <option value="ja">日语</option>
+                        <option value="ko">韩语</option>
+                        <option value="fr">法语</option>
+                        <option value="de">德语</option>
+                        <option value="es">西班牙语</option>
+                        <option value="ru">俄语</option>
+                        <option value="pt">葡萄牙语</option>
+                        <option value="it">意大利语</option>
+                        <option value="ar">阿拉伯语</option>
+                        <option value="hi">印地语</option>
+                        <option value="th">泰语</option>
+                        <option value="vi">越南语</option>
+                            </select>
+                        </label>
                     </div>
-                    <div id="ttsPlayer" class="tts-player" style="display:none;">
-                        <audio id="ttsAudio" controls style="width:100%;"></audio>
+                    <div class="translate-boxes">
+                        <textarea id="translateInput" placeholder="在此输入要翻译的文本（支持多段落，5000 字符以内）…"></textarea>
+                        <textarea id="translateOutput" placeholder="译文将显示在这里…" readonly></textarea>
                     </div>
-                    <div id="ttsStatus" class="sync-status"></div>
+                    <div class="translate-actions">
+                        <button class="draw-generate-btn" id="translateBtn" onclick="doTranslate()">🌐 开始翻译</button>
+                        <button class="draw-generate-btn" onclick="copyTranslation()" style="background:var(--bg-tertiary);color:var(--text-primary);">📋 复制译文</button>
+                        <button class="draw-generate-btn" onclick="useTranslationAsInput()" style="background:var(--bg-tertiary);color:var(--text-primary);">↩️ 回填原文</button>
+                        <span id="translateStatus" class="sync-status"></span>
+                    </div>
                     <div class="gen-history-panel">
-                        <div class="gen-history-title">🎤 语音合成历史</div>
-                        <div id="ttsHistory" class="gen-history-list"></div>
+                        <div class="gen-history-title">🌐 翻译历史</div>
+                        <div id="translateHistory" class="gen-history-list"></div>
                     </div>
                 </div>
             </div>
@@ -5328,15 +5398,62 @@
                 const ttsButton = msg.role === 'assistant'
                     ? `<button class="tts-btn" onclick="speakText('${escapeHtml(msg.content.replace(/"/g, '\\"'))}')" title="播报此消息">🔊</button>`
                     : '';
+                // 内容审核按钮（每条消息都可点，调用 llama-guard-3-8b 判定）
+                const modButton = `<button class="mod-btn" onclick="moderateMessage('${msg.id}', this)" title="内容审核（llama-guard-3-8b）">🛡️</button>`;
                 const delButton = `<button class="msg-del-btn" onclick="deleteMessage('${conversationId}', '${msg.id}')" title="删除此消息">🗑️</button>`;
                 return `
                     <div class="message ${msg.role}" data-msg-id="${msg.id}">
                         <div class="message-avatar">${msg.role === 'user' ? '👤' : '🤖'}</div>
-                        <div class="message-content">${content} ${ttsButton} ${delButton}</div>
+                        <div class="message-content">${content} ${ttsButton} ${modButton} ${delButton}</div>
                     </div>
                 `;
             }).join('');
             scrollToBottom();
+        }
+
+        // ============================================================
+        //  🛡️ 内容审核（Meta Llama Guard 3 8B）
+        //  点击任意消息上的 🛡️ 按钮，把该消息文本交给 llama-guard-3-8b 判定是否违规。
+        // ============================================================
+        async function moderateMessage(msgId, btn) {
+            const conversation = conversations.find(c => c.id === currentConversationId);
+            const msg = conversation && conversation.messages.find(m => m.id === msgId);
+            if (!msg) { showToast('未找到该消息', 'error'); return; }
+            const text = String(msg.content || '').trim();
+            if (!text) { showToast('该消息没有可审核的文本内容', 'warning'); return; }
+
+            const oldText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = '⏳';
+            btn.title = '正在审核…';
+            try {
+                const r = await fetch(CF_WORKER_API + '/moderate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text })
+                });
+                const data = await r.json().catch(function () { return {}; });
+                if (!r.ok || data.error) throw new Error(data.error || ('审核失败 (HTTP ' + r.status + ')'));
+                if (data.safe) {
+                    btn.textContent = '✅';
+                    btn.title = '审核结果：内容安全';
+                    showToast('✅ 内容审核通过：未发现违规风险', 'success');
+                } else {
+                    btn.textContent = '⚠️';
+                    btn.title = '审核结果：存在风险';
+                    var cats = (data.categories || []).map(function (x) { return x.name + '(' + x.code + ')'; }).join('、') || '未分类';
+                    showToast('⚠️ 检测到风险内容：' + cats, 'error');
+                    alert('⚠️ 内容审核结果：存在风险\n\n风险类别：' + cats +
+                        '\n\n模型判断原文：' + (data.raw || '（无）') +
+                        '\n\n审核模型：' + (data.model || '@cf/meta/llama-guard-3-8b'));
+                }
+            } catch (e) {
+                btn.textContent = oldText;
+                btn.title = '内容审核（llama-guard-3-8b）';
+                showToast('审核失败：' + (e.message || e), 'error');
+            } finally {
+                btn.disabled = false;
+            }
         }
 
         function renderMarkdown(content) {
@@ -7560,12 +7677,77 @@
         // ============================================================
         //  模式切换
         // ============================================================
+        // ============================================================
+        //  🌐 智能翻译
+        // ============================================================
+        async function doTranslate() {
+            const text = document.getElementById('translateInput').value.trim();
+            if (!text) { showToast('请输入要翻译的文本', 'warning'); return; }
+            const engine = document.getElementById('translateEngine').value;
+            const source = document.getElementById('translateSource').value;
+            const target = document.getElementById('translateTarget').value;
+            if (source !== 'auto' && source === target) { showToast('源语言与目标语言相同', 'warning'); return; }
+            const status = document.getElementById('translateStatus');
+            const out = document.getElementById('translateOutput');
+            const btn = document.getElementById('translateBtn');
+            btn.disabled = true;
+            setGenBtnLoading(btn, true, 'Translating');
+            status.textContent = '⏳ 翻译中...';
+            out.value = '';
+            try {
+                const r = await fetch(CF_WORKER_API + '/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text, source: source, target: target, engine: engine })
+                });
+                const data = await r.json().catch(function () { return {}; });
+                if (!r.ok || !data.text) throw new Error(data.error || ('翻译失败 (HTTP ' + r.status + ')'));
+                out.value = data.text;
+                var engineName = data.engine === 'glm' ? '智谱 GLM' : (data.engine === 'indic' ? 'IndicTrans2' : 'Cloudflare m2m100');
+                status.textContent = '✅ 完成（' + engineName + '）';
+                addGenRecord('translate', { title: text.slice(0, 40), prompt: text, content: data.text });
+                renderGenHistory('translate');
+            } catch (e) {
+                status.textContent = '❌ ' + (e.message || '翻译失败');
+                showToast('翻译失败：' + (e.message || e), 'error');
+            } finally {
+                btn.disabled = false;
+                setGenBtnLoading(btn, false);
+            }
+        }
+
+        function swapTranslateLangs() {
+            var s = document.getElementById('translateSource');
+            var t = document.getElementById('translateTarget');
+            if (s.value === 'auto') { showToast('源语言为自动检测时无法交换，请先指定源语言', 'warning'); return; }
+            var oldTarget = t.value;
+            t.value = s.value;
+            s.value = oldTarget;
+            showToast('已交换语言方向', 'success');
+        }
+
+        async function copyTranslation() {
+            var out = document.getElementById('translateOutput');
+            if (!out.value.trim()) { showToast('还没有译文可复制', 'warning'); return; }
+            try { await navigator.clipboard.writeText(out.value); showToast('译文已复制到剪贴板', 'success'); }
+            catch (e) { out.select(); document.execCommand('copy'); showToast('译文已复制', 'success'); }
+        }
+
+        function useTranslationAsInput() {
+            var out = document.getElementById('translateOutput');
+            if (!out.value.trim()) { showToast('还没有译文可回填', 'warning'); return; }
+            document.getElementById('translateInput').value = out.value;
+            out.value = '';
+            showToast('已把译文回填到原文框，可直接反向翻译', 'success');
+        }
+
         function switchMode(mode) {
             currentMode = mode;
-            const modes = ['chat', 'vision', 'draw', 'video', 'task', 'character', 'film', 'stats', 'longvideo', 'code', 'tts', 'embed', 'market'];
+            const modes = ['chat', 'vision', 'translate', 'draw', 'video', 'task', 'character', 'film', 'stats', 'longvideo', 'code', 'embed', 'market'];
             const elements = {
                 chat: document.getElementById('chatMode'),
                 vision: document.getElementById('visionMode'),
+                translate: document.getElementById('translateMode'),
                 draw: document.getElementById('drawMode'),
                 video: document.getElementById('videoMode'),
                 task: document.getElementById('taskMode'),
@@ -7574,7 +7756,6 @@
                 stats: document.getElementById('statsPanel'),
                 longvideo: document.getElementById('longvideoMode'),
                 code: document.getElementById('codeMode'),
-                tts: document.getElementById('ttsMode'),
                 embed: document.getElementById('embedMode'),
                 market: document.getElementById('marketMode')
             };
@@ -7679,44 +7860,6 @@
             }
         }
 
-        // ============================================================
-        //  🎤 语音合成 (TTS) —— Cloudflare Workers AI
-        // ============================================================
-        let ttsAudioUrl = null;
-        async function startTTS() {
-            const text = document.getElementById('ttsText').value.trim();
-            if (!text) { showToast('请输入要合成的文本', 'warning'); return; }
-            const lang = document.getElementById('ttsLang').value;
-            const status = document.getElementById('ttsStatus');
-            // Cloudflare TTS 模型已下线，直接使用浏览器朗读（中文效果好、免费）
-            status.textContent = '🔊 正在使用浏览器朗读...';
-            ttsSpeakFallback(text);
-        }
-
-        // 浏览器朗读兜底（系统语音，无需云端模型，中文支持良好）
-        function ttsSpeakFallback(text) {
-            try {
-                if (!window.speechSynthesis) {
-                    showToast('当前浏览器不支持语音朗读，请更换浏览器后重试', 'error');
-                    return;
-                }
-                window.speechSynthesis.cancel();
-                const u = new SpeechSynthesisUtterance(String(text).slice(0, 3000));
-                u.lang = 'zh-CN';
-                u.rate = 0.95;
-                const zh = (window.speechSynthesis.getVoices() || []).find(v => v.lang && v.lang.indexOf('zh') === 0);
-                if (zh) u.voice = zh;
-                u.onerror = function () { showToast('浏览器朗读失败，可能是系统未安装中文语音包', 'error'); };
-                window.speechSynthesis.speak(u);
-                showToast('已使用浏览器朗读', 'success');
-            } catch (e) {
-                showToast('朗读失败：' + (e.message || e), 'error');
-            }
-        }
-        function stopTTS() {
-            const audio = document.getElementById('ttsAudio');
-            if (audio) audio.pause();
-        }
 
         // ============================================================
         //  🧬 语义嵌入 / 语义检索 —— Cloudflare Workers AI
