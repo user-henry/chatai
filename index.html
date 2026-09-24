@@ -3720,6 +3720,25 @@
         .mod-btn:hover { opacity: 1; transform: scale(1.18); }
         .mod-btn:disabled { cursor: progress; opacity: .8; }
         .message-content:hover .mod-btn { opacity: .95; }
+
+        /* 模型市场：分类小标题与标签 */
+        .market-cat-title {
+            grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            font-size: 15px; font-weight: 700; color: var(--text-primary);
+            margin: 18px 0 4px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);
+        }
+        .market-cat-title:first-child { margin-top: 0; }
+        .market-cat-count {
+            font-size: 11.5px; font-weight: 600; padding: 1px 8px; border-radius: 20px;
+            background: var(--accent-color-alpha); color: var(--accent-color); border: 1px solid var(--accent-color);
+        }
+        .market-cat-desc { font-size: 12px; font-weight: 400; color: var(--text-muted); }
+        .market-tag {
+            display: inline-block; margin-top: 8px; font-size: 11.5px; padding: 3px 10px;
+            border-radius: 20px; background: var(--bg-tertiary); color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+        .market-empty { grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted); }
     </style>
     <link rel="stylesheet" href="/css/themes.css">
     <script src="/js/marked.min.js"></script>
@@ -3975,7 +3994,9 @@
             </div>
 
             <!-- ====== 翻译模式 ====== -->
-            <div class="translate-mode" id="translateMode" style="display:none;">
+            <!-- 注意：不能用内联 style="display:none"，因为 switchMode 是通过 classList.toggle('active')
+                 切换的，内联样式优先级更高会导致面板永远显示不出来（与 vision/draw 保持一致）。 -->
+            <div class="translate-mode" id="translateMode">
                 <div class="chat-header">
                     <div>
                         <h1>🌐 智能翻译</h1>
@@ -4077,7 +4098,7 @@
                 <div class="chat-header">
                     <div>
                         <h1>🧠 模型市场</h1>
-                        <p>Cloudflare Workers AI 全部免费模型 · 点击「对话」可直接体验文本/代码模型</p>
+                        <p>Cloudflare Workers AI 实测可用模型 · 文本 / 代码模型可点击「对话」直接体验</p>
                     </div>
                     <div class="model-selector">
                         <label for="marketFilter">分类：</label>
@@ -4086,9 +4107,10 @@
                             <option value="text">文本生成</option>
                             <option value="code">代码生成</option>
                             <option value="image">图像生成</option>
-                            <option value="voice">语音 / 音频</option>
+                            <option value="voice">语音识别</option>
                             <option value="embedding">语义嵌入</option>
                             <option value="vision">视觉理解</option>
+                            <option value="special">专用能力</option>
                         </select>
                     </div>
                 </div>
@@ -4504,12 +4526,11 @@
             <div class="info-section">
                 <h3>✨ 功能列表</h3>
                 <ul class="feature-list">
-                    <li>💬 智能对话 (思知 AI / 智谱 GLM / Cloudflare)</li>
-                    <li>👁️ 视觉理解</li>
-                    <li>🎨 AI 绘图</li>
-                    <li>🎬 AI 视频生成</li>
-                    <li>💻 代码生成 (Qwen2.5-Coder 等)</li>
-                    <li>🎤 语音合成 (Cloudflare TTS)</li>
+                    <li>💬 智能对话 · 实时流式输出</li>
+                    <li>👁️ 视觉理解 · 图片描述与问答</li>
+                    <li>🎨 AI 绘图 · CogView / FLUX / Pollinations</li>
+                    <li>🎬 AI 视频 · 智谱 CogVideoX</li>
+                    <li>💻 代码生成 · Qwen2.5-Coder / Qwen3</li>
                     <li>🧬 语义嵌入 / 向量检索</li>
                     <li>🧠 Cloudflare 模型市场</li>
                     <li>⏰ 定时任务</li>
@@ -4626,6 +4647,12 @@
                 { id: '@cf/baai/bge-reranker-base', name: 'BGE Reranker Base' },
                 { id: '@cf/google/embeddinggemma-300m', name: 'EmbeddingGemma 300M' },
                 { id: '@cf/pfnet/plamo-embedding-1b', name: 'PLaMo-Embedding 1B' }
+            ],
+            // 专用能力（翻译 / 内容审核，由对应功能模块调用，不参与对话下拉）
+            special: [
+                { id: '@cf/meta/m2m100-1.2b', name: 'M2M100 1.2B（多语言翻译）' },
+                { id: '@cf/ai4bharat/indictrans2-en-indic-1B', name: 'IndicTrans2（英→印度系）' },
+                { id: '@cf/meta/llama-guard-3-8b', name: 'Llama Guard 3 8B（内容审核）' }
             ],
             // 视觉理解 / 图像分类
             vision: [
@@ -7937,32 +7964,57 @@
         //  🧠 模型市场 —— 浏览全部 Cloudflare 免费模型
         // ============================================================
         const CF_MARKET_META = {
-            text: { icon: '💬', desc: '文本生成 / 对话 / 写作 / 推理' },
+            text: { icon: '💬', desc: '通用对话 / 写作 / 推理，支持流式输出' },
             code: { icon: '💻', desc: '代码补全与生成' },
-            image: { icon: '🎨', desc: '文生图' },
-            voice: { icon: '🎤', desc: '语音识别 / 翻译' },
-            embedding: { icon: '🧬', desc: '文本向量化' },
-            vision: { icon: '👁️', desc: '视觉理解' }
+            image: { icon: '🎨', desc: '文生图（原生可用的绘图模型）' },
+            voice: { icon: '🎙️', desc: '语音识别（Whisper / Nova）' },
+            embedding: { icon: '🧬', desc: '文本向量化与语义检索' },
+            vision: { icon: '👁️', desc: '图片理解与图像分类' },
+            special: { icon: '🛠️', desc: '专用能力：翻译与内容安全审核' }
         };
         function renderMarket() {
             const grid = document.getElementById('marketGrid');
             const filter = document.getElementById('marketFilter').value;
             const cats = filter === 'all' ? Object.keys(CF_MODELS) : [filter];
+            const CAT_NAME = {
+                text: '文本生成', code: '代码生成', image: '图像生成',
+                voice: '语音识别', embedding: '语义嵌入', vision: '视觉理解', special: '专用能力',
+            };
             let html = '';
             cats.forEach(cat => {
                 const meta = CF_MARKET_META[cat] || { icon: '☁️', desc: '' };
-                CF_MODELS[cat].forEach(m => {
-                    const canChat = (cat === 'text' || cat === 'code');
-                    html += `<div class="market-card">
-                        <div class="market-card-icon">${meta.icon}</div>
-                        <div class="market-card-name">${m.name}</div>
-                        <div class="market-card-id">${m.id}</div>
-                        <div class="market-card-desc">${meta.desc}</div>
-                        ${canChat ? `<button class="market-chat-btn" onclick="quickChat('${m.id}')">💬 对话</button>` : ''}
-                    </div>`;
+                const list = CF_MODELS[cat] || [];
+                if (list.length === 0) return;
+                html += '<div class="market-cat-title">' + meta.icon + ' ' + (CAT_NAME[cat] || cat) +
+                    ' <span class="market-cat-count">' + list.length + ' 个</span>' +
+                    '<span class="market-cat-desc">' + meta.desc + '</span></div>';
+                list.forEach(m => {
+                    let action = '';
+                    if (cat === 'text' || cat === 'code') {
+                        action = '<button class="market-chat-btn" onclick="quickChat(\'' + m.id + '\')">💬 对话</button>';
+                    } else if (cat === 'image') {
+                        action = '<button class="market-chat-btn" onclick="switchMode(\'draw\')">🎨 去绘图</button>';
+                    } else if (cat === 'vision') {
+                        action = '<button class="market-chat-btn" onclick="switchMode(\'vision\')">👁️ 去视觉</button>';
+                    } else if (cat === 'voice') {
+                        action = '<span class="market-tag">🎙️ 语音识别</span>';
+                    } else if (cat === 'embedding') {
+                        action = '<button class="market-chat-btn" onclick="switchMode(\'embed\')">🧬 去嵌入</button>';
+                    } else if (cat === 'special') {
+                        action = m.id.indexOf('llama-guard') >= 0
+                            ? '<span class="market-tag">🛡️ 消息上的审核按钮调用</span>'
+                            : '<button class="market-chat-btn" onclick="switchMode(\'translate\')">🌐 去翻译</button>';
+                    }
+                    html += '<div class="market-card">' +
+                        '<div class="market-card-icon">' + meta.icon + '</div>' +
+                        '<div class="market-card-name">' + m.name + '</div>' +
+                        '<div class="market-card-id">' + m.id + '</div>' +
+                        '<div class="market-card-desc">' + meta.desc + '</div>' +
+                        action +
+                        '</div>';
                 });
             });
-            grid.innerHTML = html;
+            grid.innerHTML = html || '<div class="market-empty">该分类下暂无模型</div>';
         }
         function quickChat(modelId) {
             // 跳转到对话模式并使用该模型
