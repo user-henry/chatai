@@ -18,6 +18,7 @@
 | `css/themes.css` | 主题变量（`--bg-primary`、`--text-primary`、`--accent-color`、`--hzy-shadow-*` 等）与 5 套主题的取值 |
 | `js/theme.js` | `ThemeManager`（主题读写 + `themechange` 事件）、`AuthToken`（token 存取）、全局 `fetch` 补丁（自动附加 `Authorization`，401 时跳回登录） |
 | `js/marked.min.js` | Markdown 渲染（对话内容、代码块） |
+| `js/sanitize.js` | **HTML 白名单**：`window.sanitizeHtml(html)`，对话/分享内容渲染前的统一过滤（见下文「内容安全」） |
 | `CNAME` | GitHub Pages 自定义域名：`chatai.bot.cd` |
 | `HZYAI LOGO.png` | 站点图标 / 品牌图 |
 
@@ -95,6 +96,26 @@
   - 持久化键：`localStorage['nflshc_theme']`；实现方式是给 `<html>` 设置 `data-theme="<主题>"`，再配合 `css/themes.css` 里的变量覆盖；切换时会派发 `themechange` 事件。
   - 代码里可用 `window.ThemeManager.setTheme('blue')` / `getThemeInfo()`。
 - 鉴权：token 存在 `nflshc_auth_token`（localStorage 或 sessionStorage）；`theme.js` 会打补丁包装 `window.fetch`，对发往 `worker.nflshcchat.cc.cd` 的请求自动补 `Authorization: Bearer <token>`，收到 401 时清理登录态并跳回 `index.html?next=<当前页>`。
+
+---
+
+## 内容安全：Markdown 渲染的 HTML 白名单（`js/sanitize.js`）
+
+对话正文和「分享的对话」都用 `marked` 渲染，而 **marked 默认保留内联 HTML**：模型输出里带上
+`<img src=x onerror=…>` 或有人分享一段含 `<script>` 的对话，就会在别人浏览器里执行脚本。所以渲染出口统一过一遍白名单：
+
+- `index.html` 的 `renderMarkdown()`、`share.html` 的 `renderMarkdownSimple()` 最后都调用
+  `window.sanitizeHtml(html)`；白名单脚本没加载时**退回纯文本**（`escapeHtml(content)`），绝不原样塞入。
+- 白名单规则（与 NFLSHC Chat 主站、Windows 桌面端同一份实现）：
+  - 保留：段落/标题/列表/表格/代码/引用，以及 `img`、`video`、`audio`、`source`、`track`、`figure`、`details`、`time`；
+  - 整段删除：`script`、`style`、`iframe`、`object`/`embed`、`form` 及控件、`link`/`meta`/`base`、`svg`、`math` 等；
+  - 属性按标签放行，`on*` 事件天然进不来，`id`/`name` 一律删除（防 DOM clobbering）；
+  - 地址只放行 http(s)、站内相对路径、`mailto:`/`tel:`（仅链接）、位图 `data:image/…;base64,`；
+    `javascript:`、`data:text/html` 等一律丢弃（判定前先剥掉协议里的空白/制表符，挡 `java\tscript:` 绕过）；
+  - `style` 只保留 `max-width`/`width`/`height`/`margin`/`border-radius`/`object-fit`，禁止 `position`/`inset`/`z-index`。
+- 结果：图片、`<video controls>`、`<audio controls>` 这类内联媒体照旧可用（贴文件托管站直链没问题），
+  脚本类载荷全部被拆掉。回归脚本：`node dev/tests/test-chatai-sanitize.mjs`（在 NFLSHC 主仓库的 `dev/tests/` 下，
+  跑在真实线上环境）——25/25 通过，覆盖 8 种攻击载荷 + 两个渲染函数 + 「没有任何载荷真的执行」。
 
 ---
 
