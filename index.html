@@ -3768,6 +3768,7 @@
     </style>
     <link rel="stylesheet" href="/css/themes.css">
     <script src="/js/marked.min.js"></script>
+<script src="/js/sanitize.js?v=1"></script>
 </head>
 <body>
 <div id="fatalErrorBar" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:#dc3545;color:#fff;padding:10px 14px;font:13px/1.5 monospace;white-space:pre-wrap;max-height:40vh;overflow:auto;box-shadow:0 2px 8px rgba(0,0,0,.4);"></div>
@@ -3864,6 +3865,9 @@
                 </select>
             </div>
             <button class="new-chat-btn" onclick="createNewConversation()">+ 新对话</button>
+            <a class="new-chat-btn" href="https://nflshcchat.cc.cd/study.html" target="_blank" rel="noopener"
+               style="display:block;text-align:center;text-decoration:none;margin-top:8px;"
+               title="AI 讲题（支持拍照识别题目）+ 错题本">📚 学习（讲题 / 错题本）</a>
             <div class="conversations-list" id="conversationsList"></div>
             <div class="user-info">
                 <div class="user-avatar" id="userAvatar"></div>
@@ -5593,10 +5597,15 @@
         }
 
         function renderMarkdown(content) {
+            var html;
             if (typeof marked !== 'undefined') {
-                try { return marked.parse(content); } catch (e) { return escapeHtml(content); }
+                try { html = marked.parse(content); } catch (e) { html = escapeHtml(content); }
+            } else {
+                html = escapeHtml(content).replace(/\n/g, '<br>');
             }
-            return escapeHtml(content).replace(/\n/g, '<br>');
+            // HTML 白名单：允许图片/视频/音频等内联 HTML，去掉脚本、事件属性与危险链接；
+            // 万一白名单脚本没加载（例如离线缓存缺文件），退回纯文本，绝不直接塞原文
+            return window.sanitizeHtml ? window.sanitizeHtml(html) : escapeHtml(content);
         }
 
         function addMessage(role, content, mediaUrl, mediaType) {
