@@ -1240,6 +1240,7 @@
     </style>
     <!-- 引入 Marked 和 Highlight.js -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="/js/sanitize.js?v=1"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <link rel="stylesheet" href="css/themes.css">
@@ -2110,19 +2111,20 @@
 
         function renderMarkdownSimple(content) {
             if (!content) return '';
-            let html = content;
+            let html = escapeHtml(content);
             if (typeof marked !== 'undefined') {
                 try {
                     html = marked.parse(content);
-                    if (html && typeof html.then === 'function') html = content;
-                } catch (e) { html = content; }
+                    if (html && typeof html.then === 'function') html = escapeHtml(content);
+                } catch (e) { html = escapeHtml(content); }
             }
             // 基本的 Markdown 回退
             html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
             html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
             html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
             html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-            return html;
+            // HTML 白名单：分享的对话来自其他用户，必须过滤；白名单脚本缺失时退回纯文本
+            return window.sanitizeHtml ? window.sanitizeHtml(html) : escapeHtml(content);
         }
 
         // ============================================================
